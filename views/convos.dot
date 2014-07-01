@@ -8,6 +8,4 @@
 	{{~ it :v:k }}
 		{{#def.convo}}
 	{{~}}
-
-	<button id="fancy-new">New</button>
 </div>

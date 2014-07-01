@@ -1,4 +1,4 @@
 <span>{{= it.title }}</span>
 
-<a id="fancy-{{= it.which }}">{{= it.which }}</a>
+<a id="fancy-newchats">{{= it.which }}</a>
 <a id="fancy-close">X</a>

@@ -2,9 +2,6 @@
 !function(a,b){"function"==typeof define&&define.amd?define(b):"object"==typeof exports?module.exports=b:a.atomic=b(a)}(this,function(a){"use strict";var b={},c=function(a){var b;try{b=JSON.parse(a.responseText)}catch(c){b=a.responseText}return[b,a]},d=function(b,d,e){var f={success:function(){},error:function(){}},g=a.XMLHttpRequest||ActiveXObject,h=new g("MSXML2.XMLHTTP.3.0");return h.open(b,d,!0),h.setRequestHeader("Content-type","application/x-www-form-urlencoded"),h.onreadystatechange=function(){4===h.readyState&&(200===h.status?f.success.apply(f,c(h)):f.error.apply(f,c(h)))},h.send(e),{success:function(a){return f.success=a,f},error:function(a){return f.error=a,f}}};return b.get=function(a){return d("GET",a)},b.put=function(a,b){return d("PUT",a,b)},b.post=function(a,b){return d("POST",a,b)},b["delete"]=function(a){return d("DELETE",a)},b});
 
 var FancyChat = {
-	btnClose: null,
-	btnChats: null,
-	btnSend: null,
 	msgBox: null,
 	chat: null,
 	convos: null,
@@ -46,7 +43,6 @@ var FancyChat = {
 		// TODO options
 
 		this.renderWidget('fancy');
-		this.renderHeader({title: 'new chat', which: 'chats'});
 		this.renderChat();
 
 		this.cache();
@@ -57,8 +53,6 @@ var FancyChat = {
 		this.msgBox.value = '';
 
 		if(message !== '') {
-			console.log(message);
-
 			if(this.current) { // replying to an existing conversation
 				var reply = {
 					created: Date.now(),
@@ -92,12 +86,15 @@ var FancyChat = {
 
 	onChatsClick: function() {
 		this.renderConvos();
+		this.renderHeader({title: 'previous chats', which: 'new'});
 
 		this.current = null;
 
 		var self = this;
 
 		var fn = function() {
+			// TODO check for new data?
+
 			var id = this.getAttribute("data-id");
 			self.current = self.conversations[id];
 
@@ -126,44 +123,43 @@ var FancyChat = {
 
 		div.innerHTML = this.templates.header(data);
 
-		this.btnClose = document.getElementById('fancy-close');
-		this.btnChats = document.getElementById('fancy-chats');
+		var btnClose = document.getElementById('fancy-close');
+		var btnNewChats = document.getElementById('fancy-newchats');
 
-		this.btnChats.addEventListener('click', function() {
-			self.onChatsClick();
-		});
+		var chatsFn = function() { self.onChatsClick(); };
+		var newFn = function() {
+			self.current = null;
+			self.renderChat();
+		};
+
+		btnNewChats.addEventListener('click', data.which == 'new' ? newFn : chatsFn);
 	},
 
 	renderChat: function() {
 		var self = this;
 
+		this.renderHeader({title: 'new chat', which: 'chats'});
+
 		this.chat.innerHTML = this.templates.chat();
 		this.convos.innerHTML = '';
 
-		this.btnSend = document.getElementById('fancy-send');
+		var btnSend = document.getElementById('fancy-send');
 		this.msgBox = document.getElementById('fancy-message');
 		this.messages = document.getElementById('fancy-messages');
 
-		this.btnSend.addEventListener('click', function() {
+		btnSend.addEventListener('click', function() {
 			self.onSendClick();
 		});
 	},
 
 	renderConvos: function() {
-		var self = this;
-
 		this.convos.innerHTML = this.templates.convos(this.conversations);
 		this.chat.innerHTML = '';
-
-		var newBtn = document.getElementById('fancy-new');
-
-		newBtn.addEventListener('click', function() {
-			self.current = null;
-			self.renderChat();
-		});
 	},
 
 	renderMessages: function(data) {
+		this.renderHeader({title: 'existing chat', which: 'chats'});
+
 		var div = document.getElementById('fancy-messages');
 
 		div.innerHTML = this.templates.messages(data);
@@ -180,10 +176,10 @@ FancyChat["templates"]["chat"] = function anonymous(it) {
 var out='<div id="fancy-messages"></div><div class="send"><div class="message"><textarea id="fancy-message" placeholder="batman"></textarea></div><button id="fancy-send">Send</button></div>';return out;
 };
 FancyChat["templates"]["convos"] = function anonymous(it) {
-var out='<div id="fancy-convos">';var arr1=it;if(arr1){var v,k=-1,l1=arr1.length-1;while(k<l1){v=arr1[k+=1];out+='<div class="convo" data-id="'+( k )+'">'+( v.content )+'</div>';} } out+='<button id="fancy-new">New</button></div>';return out;
+var out='<div id="fancy-convos">';var arr1=it;if(arr1){var v,k=-1,l1=arr1.length-1;while(k<l1){v=arr1[k+=1];out+='<div class="convo" data-id="'+( k )+'">'+( v.content )+'</div>';} } out+='</div>';return out;
 };
 FancyChat["templates"]["header"] = function anonymous(it) {
-var out='<span>'+( it.title )+'</span><a id="fancy-'+( it.which )+'">'+( it.which )+'</a><a id="fancy-close">X</a>';return out;
+var out='<span>'+( it.title )+'</span><a id="fancy-newchats">'+( it.which )+'</a><a id="fancy-close">X</a>';return out;
 };
 FancyChat["templates"]["messages"] = function anonymous(it) {
 var out=''; var prev = it.direction; out+='<div class="'+( it.direction )+'"><p class="message">'+( it.content )+'</p>';var arr1=it.replies;if(arr1){var m,i1=-1,l1=arr1.length-1;while(i1<l1){m=arr1[i1+=1];if(m.direction === prev){out+='<p class="message">'+( m.content )+'</p>';}else{out+='</div><div class="'+( m.direction )+'"><p class="message">'+( m.content )+'</p>';} prev = m.direction; } } out+='</div>';return out;

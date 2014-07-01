@@ -1,7 +1,4 @@
 var FancyChat = {
-	btnClose: null,
-	btnChats: null,
-	btnSend: null,
 	msgBox: null,
 	chat: null,
 	convos: null,
@@ -43,7 +40,6 @@ var FancyChat = {
 		// TODO options
 
 		this.renderWidget('fancy');
-		this.renderHeader({title: 'new chat', which: 'chats'});
 		this.renderChat();
 
 		this.cache();
@@ -54,8 +50,6 @@ var FancyChat = {
 		this.msgBox.value = '';
 
 		if(message !== '') {
-			console.log(message);
-
 			if(this.current) { // replying to an existing conversation
 				var reply = {
 					created: Date.now(),
@@ -89,12 +83,15 @@ var FancyChat = {
 
 	onChatsClick: function() {
 		this.renderConvos();
+		this.renderHeader({title: 'previous chats', which: 'new'});
 
 		this.current = null;
 
 		var self = this;
 
 		var fn = function() {
+			// TODO check for new data?
+
 			var id = this.getAttribute("data-id");
 			self.current = self.conversations[id];
 
@@ -123,44 +120,43 @@ var FancyChat = {
 
 		div.innerHTML = this.templates.header(data);
 
-		this.btnClose = document.getElementById('fancy-close');
-		this.btnChats = document.getElementById('fancy-chats');
+		var btnClose = document.getElementById('fancy-close');
+		var btnNewChats = document.getElementById('fancy-newchats');
 
-		this.btnChats.addEventListener('click', function() {
-			self.onChatsClick();
-		});
+		var chatsFn = function() { self.onChatsClick(); };
+		var newFn = function() {
+			self.current = null;
+			self.renderChat();
+		};
+
+		btnNewChats.addEventListener('click', data.which == 'new' ? newFn : chatsFn);
 	},
 
 	renderChat: function() {
 		var self = this;
 
+		this.renderHeader({title: 'new chat', which: 'chats'});
+
 		this.chat.innerHTML = this.templates.chat();
 		this.convos.innerHTML = '';
 
-		this.btnSend = document.getElementById('fancy-send');
+		var btnSend = document.getElementById('fancy-send');
 		this.msgBox = document.getElementById('fancy-message');
 		this.messages = document.getElementById('fancy-messages');
 
-		this.btnSend.addEventListener('click', function() {
+		btnSend.addEventListener('click', function() {
 			self.onSendClick();
 		});
 	},
 
 	renderConvos: function() {
-		var self = this;
-
 		this.convos.innerHTML = this.templates.convos(this.conversations);
 		this.chat.innerHTML = '';
-
-		var newBtn = document.getElementById('fancy-new');
-
-		newBtn.addEventListener('click', function() {
-			self.current = null;
-			self.renderChat();
-		});
 	},
 
 	renderMessages: function(data) {
+		this.renderHeader({title: 'existing chat', which: 'chats'});
+
 		var div = document.getElementById('fancy-messages');
 
 		div.innerHTML = this.templates.messages(data);
