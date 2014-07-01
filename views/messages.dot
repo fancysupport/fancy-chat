@@ -1,0 +1,19 @@
+{{##def.message:param:
+	<p class="message">{{= param.content }}</p>
+#}}
+
+{{ var prev = it.direction; }}
+	<div class="{{= it.direction }}">
+		{{#def.message:it}}
+
+{{~ it.replies :m }}
+	{{? m.direction === prev }}
+		{{#def.message:m}}
+	{{??}}
+		</div><div class="{{= m.direction }}">
+			{{#def.message:m}}
+	{{?}}
+	{{ prev = m.direction; }}
+
+{{~}}
+</div>

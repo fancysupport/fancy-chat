@@ -1,0 +1,11 @@
+<div id="fancy-messages">
+
+</div>
+
+<div class="send">
+	<div class="message">
+		<textarea id="fancy-message" placeholder="batman"></textarea>
+	</div>
+
+	<button id="fancy-send">Send</button>
+</div>

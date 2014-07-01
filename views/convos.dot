@@ -1,0 +1,13 @@
+{{##def.convo:
+	<div class="convo" data-id="{{= k }}">
+		{{= v.content }}
+	</div>
+#}}
+
+<div id="fancy-convos">
+	{{~ it :v:k }}
+		{{#def.convo}}
+	{{~}}
+
+	<button id="fancy-new">New</button>
+</div>

@@ -1,0 +1,10 @@
+{
+  "devDependencies": {
+    "gulp": "^3.8.5",
+    "gulp-concat": "^2.2.0",
+    "gulp-header": "^1.0.2",
+    "gulp-dot-precompiler": "^0.3.0",
+    "run-sequence": "^0.3.6",
+    "gulp-clean": "~0.3.1"
+  }
+}
