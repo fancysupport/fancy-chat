@@ -42,7 +42,12 @@ var FancyChat = {
 	init: function(options) {
 		// TODO options
 
-		this.renderWidget('fancy');
+		document.querySelector(options.activator)
+			.addEventListener('click', function() {
+				document.getElementById('fancy-chat').className = 'block';
+			});
+
+		this.renderWidget();
 		this.renderChat();
 
 		this.cache();
@@ -108,8 +113,16 @@ var FancyChat = {
 		}
 	},
 
-	renderWidget: function(data) {
-		var div = document.getElementById(data);
+	renderWidget: function() {
+		// append the widget to the end of the body, check to make sure
+		// it hasn't already been created, if it has, recreate
+		var div = document.getElementById('fancy-chat');
+		if(!div) {
+			div = document.createElement('div');
+			div.id = 'fancy-chat';
+			div.className = 'hide';
+			document.body.appendChild(div);
+		}
 
 		div.innerHTML = this.templates.widget();
 
@@ -133,6 +146,10 @@ var FancyChat = {
 		};
 
 		btnNewChats.addEventListener('click', data.which == 'new' ? newFn : chatsFn);
+
+		btnClose.addEventListener('click', function() {
+			document.getElementById('fancy-chat').className = 'hide';
+		});
 	},
 
 	renderChat: function() {
@@ -167,6 +184,35 @@ var FancyChat = {
 	}
 };
 
-window.onload = function() {
-	FancyChat.init();
+(function (doc, cssText) {
+    var styleEl = doc.createElement("style");
+    doc.getElementsByTagName("head")[0].appendChild(styleEl);
+    if (styleEl.styleSheet) {
+        if (!styleEl.styleSheet.disabled) {
+            styleEl.styleSheet.cssText = cssText;
+        }
+    } else {
+        try {
+            styleEl.innerHTML = cssText;
+        } catch (ignore) {
+            styleEl.innerText = cssText;
+        }
+    }
+}(document, "#fancy-chat{position:fixed;left:50%;top:50%;width:650px;margin-left:-325px;height:450px;margin-top:-225px;z-index:1234;box-shadow:0 0 0 1px #000;}#fancy-chat.hide{display:none}#fancy-chat.block{display:block}#fancy-chat .header{height:80px;box-shadow:0 0 0 1px #000;}#fancy-chat .header span{position:absolute;top:25px;left:50px;font-size:18pt;width:550px;text-align:center}#fancy-chat .header a{position:absolute;right:32px;top:31px;width:25px;height:25px;cursor:pointer;text-align:center;}#fancy-chat .header a#fancy-close{right:5px}#fancy-chat #fancy-messages{margin-top:1px;height:250px;box-shadow:0 0 0 1px #000;overflow-y:auto;}#fancy-chat #fancy-messages .message{overflow:hidden;margin:0}#fancy-chat #fancy-messages .in{background-color:#ebebeb;}#fancy-chat #fancy-messages .in .message{padding-left:10px}#fancy-chat #fancy-messages .out .message{text-align:right;padding-right:10px}#fancy-chat .send{position:relative;height:120px;}#fancy-chat .send button{position:absolute;right:5px;top:8px;width:12%;height:104px}#fancy-chat .send .message{width:85%;margin:0;padding-top:8px;padding-left:8px;}#fancy-chat .send .message textarea{width:100%;resize:none;height:104px}"));
+
+FancyChat.templates = {};
+FancyChat["templates"]["chat"] = function anonymous(it) {
+var out='<div id="fancy-messages"></div><div class="send"><div class="message"><textarea id="fancy-message" placeholder="batman"></textarea></div><button id="fancy-send">Send</button></div>';return out;
+};
+FancyChat["templates"]["convos"] = function anonymous(it) {
+var out='<div id="fancy-convos">';var arr1=it;if(arr1){var v,k=-1,l1=arr1.length-1;while(k<l1){v=arr1[k+=1];out+='<div class="convo" data-id="'+( k )+'">'+( v.content )+'</div>';} } out+='</div>';return out;
+};
+FancyChat["templates"]["header"] = function anonymous(it) {
+var out='<span>'+( it.title )+'</span><a id="fancy-newchats">'+( it.which )+'</a><a id="fancy-close">X</a>';return out;
+};
+FancyChat["templates"]["messages"] = function anonymous(it) {
+var out=''; var prev = it.direction; out+='<div class="'+( it.direction )+'"><p class="message">'+( it.content )+'</p>';var arr1=it.replies;if(arr1){var m,i1=-1,l1=arr1.length-1;while(i1<l1){m=arr1[i1+=1];if(m.direction === prev){out+='<p class="message">'+( m.content )+'</p>';}else{out+='</div><div class="'+( m.direction )+'"><p class="message">'+( m.content )+'</p>';} prev = m.direction; } } out+='</div>';return out;
+};
+FancyChat["templates"]["widget"] = function anonymous(it) {
+var out='<div class="header"></div><div class="body"><div class="chat"></div><div class="convos"></div></div>';return out;
 };

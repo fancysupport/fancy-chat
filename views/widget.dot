@@ -1,9 +1,0 @@
-<div id="fancy-chat">
-	<div class="header"></div>
-
-	<div class="body">
-		<div class="chat"></div>
-
-		<div class="convos"></div>
-	</div>
-</div>

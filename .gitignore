@@ -5,3 +5,6 @@ Thumbs.db
 sftp-config.json
 *.sublime-workspace
 node_modules/
+
+src/js/fancycss.js
+src/js/templates.js

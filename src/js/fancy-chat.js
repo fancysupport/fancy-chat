@@ -39,7 +39,12 @@ var FancyChat = {
 	init: function(options) {
 		// TODO options
 
-		this.renderWidget('fancy');
+		document.querySelector(options.activator)
+			.addEventListener('click', function() {
+				document.getElementById('fancy-chat').className = 'block';
+			});
+
+		this.renderWidget();
 		this.renderChat();
 
 		this.cache();
@@ -105,8 +110,16 @@ var FancyChat = {
 		}
 	},
 
-	renderWidget: function(data) {
-		var div = document.getElementById(data);
+	renderWidget: function() {
+		// append the widget to the end of the body, check to make sure
+		// it hasn't already been created, if it has, recreate
+		var div = document.getElementById('fancy-chat');
+		if(!div) {
+			div = document.createElement('div');
+			div.id = 'fancy-chat';
+			div.className = 'hide';
+			document.body.appendChild(div);
+		}
 
 		div.innerHTML = this.templates.widget();
 
@@ -130,6 +143,10 @@ var FancyChat = {
 		};
 
 		btnNewChats.addEventListener('click', data.which == 'new' ? newFn : chatsFn);
+
+		btnClose.addEventListener('click', function() {
+			document.getElementById('fancy-chat').className = 'hide';
+		});
 	},
 
 	renderChat: function() {
@@ -162,8 +179,4 @@ var FancyChat = {
 		div.innerHTML = this.templates.messages(data);
 		div.scrollTop = div.scrollHeight;
 	}
-};
-
-window.onload = function() {
-	FancyChat.init();
 };

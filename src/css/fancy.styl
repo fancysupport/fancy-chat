@@ -1,8 +1,23 @@
 #fancy-chat
-	position relative
+	position fixed
+
+	left 50%
+	top 50%
+
 	width 650px
+	margin-left -(@width / 2)
 	height 450px
+	margin-top -(@height / 2)
+
+	z-index 1234
+
 	box-shadow 0 0 0 1px black
+
+	&.hide
+		display none
+
+	&.block
+		display block
 
 	.header
 		height 80px
