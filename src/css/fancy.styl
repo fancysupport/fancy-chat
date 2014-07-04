@@ -1,3 +1,19 @@
+vendor(prop, args)
+	-webkit-{prop} args
+	-moz-{prop} args
+	{prop} args
+
+border-radius()
+	vendor(border-radius, arguments)
+
+user-select()
+	vendor(user-select, arguments)
+
+box-sizing()
+	vendor(box-sizing, arguments)
+
+
+
 #fancy-chat
 	position fixed
 
@@ -12,6 +28,11 @@
 	z-index 1234
 
 	box-shadow 0 0 0 1px black
+
+	*
+		box-sizing(border-box)
+		margin 0
+		padding 0
 
 	&.hide
 		display none
@@ -67,20 +88,42 @@
 		position relative
 		height 120px
 
-		button
+		#fancy-send
 			position absolute
-			right 5px
+			right 8px
 			top 8px
-			width 12%
+			width 13%
 			height 104px
+			line-height @height
+
+			cursor pointer
+			display inline-block
+			text-align center
+
+			outline none
+			border none
+			background-color #D6D6D6
+			color #808080
+
+			border-radius(0.25em)
+			user-select(none)
 
 		.message
-			width 85%
+			width 550px
 			margin 0
 			padding-top 8px
 			padding-left 8px
 
 			textarea
 				width 100%
-				resize none
 				height 104px
+				resize none
+
+				padding 0.6em 1em
+
+				line-height 1.33
+				vertical-align top
+
+				outline none
+
+				border-radius(0.3125em)

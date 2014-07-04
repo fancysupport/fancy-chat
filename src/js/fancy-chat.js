@@ -5,13 +5,10 @@ var FancyChat = {
 	current: null,
 	conversations: [],
 
-	// set up local references for things
 	cache: function() {
 		// dummy data
 		for(var i=1; i<5; i++) {
 			var data = {
-				created: Date.now(),
-				updated: Date.now(),
 				customer: 123,
 				direction: 'in',
 				sender: 123,
@@ -21,8 +18,6 @@ var FancyChat = {
 
 			for(var j=0; j<15; j++) {
 				var reply = {
-					created: Date.now(),
-					updated: Date.now(),
 					customer: i,
 					direction: Math.random() > 0.5 ? 'in' : 'out',
 					sender: i,
@@ -37,15 +32,23 @@ var FancyChat = {
 	},
 
 	init: function(options) {
+		var self = this;
 		// TODO options
 
 		document.querySelector(options.activator)
-			.addEventListener('click', function() {
-				document.getElementById('fancy-chat').className = 'block';
-			});
+		.addEventListener('click', function() {
+			self.renderWidget();
+			self.renderChat();
+		});
 
-		this.renderWidget();
-		this.renderChat();
+		function encodeHTMLSource() {
+			var encodeHTMLRules = { "&": "&#38;", "<": "&#60;", ">": "&#62;", '"': '&#34;', "'": '&#39;', "/": '&#47;' },
+			matchHTML = /&(?!#?\w+;)|<|>|"|'|\//g;
+			return function() {
+				return this ? this.replace(matchHTML, function(m) {return encodeHTMLRules[m] || m;}) : this;
+			};
+		}
+		String.prototype.encodeHTML = encodeHTMLSource();
 
 		this.cache();
 	},
@@ -57,19 +60,15 @@ var FancyChat = {
 		if(message !== '') {
 			if(this.current) { // replying to an existing conversation
 				var reply = {
-					created: Date.now(),
 					customer: 'me', // FIXME
 					sender: 'me', // FIXME
 					direction: 'in',
 					content: message
 				};
 
-				this.current.updated = Date.now();
-
 				this.current.replies.push(reply);
 			} else {  // creating a new conversation
 				this.current = {
-					created: Date.now(),
 					customer: 'me', // FIXME
 					sender: 'me', // FIXME
 					direction: 'in',
@@ -117,7 +116,6 @@ var FancyChat = {
 		if(!div) {
 			div = document.createElement('div');
 			div.id = 'fancy-chat';
-			div.className = 'hide';
 			document.body.appendChild(div);
 		}
 
@@ -145,7 +143,7 @@ var FancyChat = {
 		btnNewChats.addEventListener('click', data.which == 'new' ? newFn : chatsFn);
 
 		btnClose.addEventListener('click', function() {
-			document.getElementById('fancy-chat').className = 'hide';
+			self.removeWidget();
 		});
 	},
 
@@ -178,5 +176,11 @@ var FancyChat = {
 
 		div.innerHTML = this.templates.messages(data);
 		div.scrollTop = div.scrollHeight;
+	}, 
+
+	removeWidget: function() {
+		document.body.removeChild(document.getElementById('fancy-chat'));
+		this.messages = null;
+		this.msgBox = null;
 	}
 };

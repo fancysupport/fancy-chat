@@ -8,13 +8,10 @@ var FancyChat = {
 	current: null,
 	conversations: [],
 
-	// set up local references for things
 	cache: function() {
 		// dummy data
 		for(var i=1; i<5; i++) {
 			var data = {
-				created: Date.now(),
-				updated: Date.now(),
 				customer: 123,
 				direction: 'in',
 				sender: 123,
@@ -24,8 +21,6 @@ var FancyChat = {
 
 			for(var j=0; j<15; j++) {
 				var reply = {
-					created: Date.now(),
-					updated: Date.now(),
 					customer: i,
 					direction: Math.random() > 0.5 ? 'in' : 'out',
 					sender: i,
@@ -40,15 +35,23 @@ var FancyChat = {
 	},
 
 	init: function(options) {
+		var self = this;
 		// TODO options
 
 		document.querySelector(options.activator)
-			.addEventListener('click', function() {
-				document.getElementById('fancy-chat').className = 'block';
-			});
+		.addEventListener('click', function() {
+			self.renderWidget();
+			self.renderChat();
+		});
 
-		this.renderWidget();
-		this.renderChat();
+		function encodeHTMLSource() {
+			var encodeHTMLRules = { "&": "&#38;", "<": "&#60;", ">": "&#62;", '"': '&#34;', "'": '&#39;', "/": '&#47;' },
+			matchHTML = /&(?!#?\w+;)|<|>|"|'|\//g;
+			return function() {
+				return this ? this.replace(matchHTML, function(m) {return encodeHTMLRules[m] || m;}) : this;
+			};
+		}
+		String.prototype.encodeHTML = encodeHTMLSource();
 
 		this.cache();
 	},
@@ -60,19 +63,15 @@ var FancyChat = {
 		if(message !== '') {
 			if(this.current) { // replying to an existing conversation
 				var reply = {
-					created: Date.now(),
 					customer: 'me', // FIXME
 					sender: 'me', // FIXME
 					direction: 'in',
 					content: message
 				};
 
-				this.current.updated = Date.now();
-
 				this.current.replies.push(reply);
 			} else {  // creating a new conversation
 				this.current = {
-					created: Date.now(),
 					customer: 'me', // FIXME
 					sender: 'me', // FIXME
 					direction: 'in',
@@ -120,7 +119,6 @@ var FancyChat = {
 		if(!div) {
 			div = document.createElement('div');
 			div.id = 'fancy-chat';
-			div.className = 'hide';
 			document.body.appendChild(div);
 		}
 
@@ -148,7 +146,7 @@ var FancyChat = {
 		btnNewChats.addEventListener('click', data.which == 'new' ? newFn : chatsFn);
 
 		btnClose.addEventListener('click', function() {
-			document.getElementById('fancy-chat').className = 'hide';
+			self.removeWidget();
 		});
 	},
 
@@ -181,6 +179,12 @@ var FancyChat = {
 
 		div.innerHTML = this.templates.messages(data);
 		div.scrollTop = div.scrollHeight;
+	}, 
+
+	removeWidget: function() {
+		document.body.removeChild(document.getElementById('fancy-chat'));
+		this.messages = null;
+		this.msgBox = null;
 	}
 };
 
@@ -198,11 +202,11 @@ var FancyChat = {
             styleEl.innerText = cssText;
         }
     }
-}(document, "#fancy-chat{position:fixed;left:50%;top:50%;width:650px;margin-left:-325px;height:450px;margin-top:-225px;z-index:1234;box-shadow:0 0 0 1px #000;}#fancy-chat.hide{display:none}#fancy-chat.block{display:block}#fancy-chat .header{height:80px;box-shadow:0 0 0 1px #000;}#fancy-chat .header span{position:absolute;top:25px;left:50px;font-size:18pt;width:550px;text-align:center}#fancy-chat .header a{position:absolute;right:32px;top:31px;width:25px;height:25px;cursor:pointer;text-align:center;}#fancy-chat .header a#fancy-close{right:5px}#fancy-chat #fancy-messages{margin-top:1px;height:250px;box-shadow:0 0 0 1px #000;overflow-y:auto;}#fancy-chat #fancy-messages .message{overflow:hidden;margin:0}#fancy-chat #fancy-messages .in{background-color:#ebebeb;}#fancy-chat #fancy-messages .in .message{padding-left:10px}#fancy-chat #fancy-messages .out .message{text-align:right;padding-right:10px}#fancy-chat .send{position:relative;height:120px;}#fancy-chat .send button{position:absolute;right:5px;top:8px;width:12%;height:104px}#fancy-chat .send .message{width:85%;margin:0;padding-top:8px;padding-left:8px;}#fancy-chat .send .message textarea{width:100%;resize:none;height:104px}"));
+}(document, "#fancy-chat{position:fixed;left:50%;top:50%;width:650px;margin-left:-325px;height:450px;margin-top:-225px;z-index:1234;box-shadow:0 0 0 1px #000;}#fancy-chat *{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;margin:0;padding:0}#fancy-chat.hide{display:none}#fancy-chat.block{display:block}#fancy-chat .header{height:80px;box-shadow:0 0 0 1px #000;}#fancy-chat .header span{position:absolute;top:25px;left:50px;font-size:18pt;width:550px;text-align:center}#fancy-chat .header a{position:absolute;right:32px;top:31px;width:25px;height:25px;cursor:pointer;text-align:center;}#fancy-chat .header a#fancy-close{right:5px}#fancy-chat #fancy-messages{margin-top:1px;height:250px;box-shadow:0 0 0 1px #000;overflow-y:auto;}#fancy-chat #fancy-messages .message{overflow:hidden;margin:0}#fancy-chat #fancy-messages .in{background-color:#ebebeb;}#fancy-chat #fancy-messages .in .message{padding-left:10px}#fancy-chat #fancy-messages .out .message{text-align:right;padding-right:10px}#fancy-chat .send{position:relative;height:120px;}#fancy-chat .send #fancy-send{position:absolute;right:8px;top:8px;width:13%;height:104px;line-height:104px;cursor:pointer;display:inline-block;text-align:center;outline:none;border:none;background-color:#d6d6d6;color:#808080;-webkit-border-radius:.25em;-moz-border-radius:.25em;border-radius:.25em;-webkit-user-select:none;-moz-user-select:none;user-select:none}#fancy-chat .send .message{width:550px;margin:0;padding-top:8px;padding-left:8px;}#fancy-chat .send .message textarea{width:100%;height:104px;resize:none;padding:.6em 1em;line-height:1.33;vertical-align:top;outline:none;-webkit-border-radius:.3125em;-moz-border-radius:.3125em;border-radius:.3125em}"));
 
 FancyChat.templates = {};
 FancyChat["templates"]["chat"] = function anonymous(it) {
-var out='<div id="fancy-messages"></div><div class="send"><div class="message"><textarea id="fancy-message" placeholder="batman"></textarea></div><button id="fancy-send">Send</button></div>';return out;
+var out='<div id="fancy-messages"></div><div class="send"><div class="message"><textarea id="fancy-message" placeholder="batman"></textarea></div><div id="fancy-send">Send</div></div>';return out;
 };
 FancyChat["templates"]["convos"] = function anonymous(it) {
 var out='<div id="fancy-convos">';var arr1=it;if(arr1){var v,k=-1,l1=arr1.length-1;while(k<l1){v=arr1[k+=1];out+='<div class="convo" data-id="'+( k )+'">'+( v.content )+'</div>';} } out+='</div>';return out;
@@ -211,7 +215,7 @@ FancyChat["templates"]["header"] = function anonymous(it) {
 var out='<span>'+( it.title )+'</span><a id="fancy-newchats">'+( it.which )+'</a><a id="fancy-close">X</a>';return out;
 };
 FancyChat["templates"]["messages"] = function anonymous(it) {
-var out=''; var prev = it.direction; out+='<div class="'+( it.direction )+'"><p class="message">'+( it.content )+'</p>';var arr1=it.replies;if(arr1){var m,i1=-1,l1=arr1.length-1;while(i1<l1){m=arr1[i1+=1];if(m.direction === prev){out+='<p class="message">'+( m.content )+'</p>';}else{out+='</div><div class="'+( m.direction )+'"><p class="message">'+( m.content )+'</p>';} prev = m.direction; } } out+='</div>';return out;
+var out=''; var prev = it.direction; out+='<div class="'+( it.direction )+'"><p class="message">'+( it.content ||'').toString().encodeHTML()+'</p>';var arr1=it.replies;if(arr1){var m,i1=-1,l1=arr1.length-1;while(i1<l1){m=arr1[i1+=1];if(m.direction === prev){out+='<p class="message">'+( m.content ||'').toString().encodeHTML()+'</p>';}else{out+='</div><div class="'+( m.direction )+'"><p class="message">'+( m.content ||'').toString().encodeHTML()+'</p>';} prev = m.direction; } } out+='</div>';return out;
 };
 FancyChat["templates"]["widget"] = function anonymous(it) {
 var out='<div class="header"></div><div class="body"><div class="chat"></div><div class="convos"></div></div>';return out;

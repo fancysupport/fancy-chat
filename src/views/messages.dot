@@ -1,5 +1,5 @@
 {{##def.message:param:
-	<p class="message">{{= param.content }}</p>
+	<p class="message">{{! param.content }}</p>
 #}}
 
 {{ var prev = it.direction; }}

@@ -1,6 +1,6 @@
 {{##def.convo:
 	<div class="convo" data-id="{{= k }}">
-		{{= v.content }}
+		{{! v.content }}
 	</div>
 #}}
 

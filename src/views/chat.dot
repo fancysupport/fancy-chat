@@ -7,5 +7,5 @@
 		<textarea id="fancy-message" placeholder="batman"></textarea>
 	</div>
 
-	<button id="fancy-send">Send</button>
+	<div id="fancy-send">Send</div>
 </div>
