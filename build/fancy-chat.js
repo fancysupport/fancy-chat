@@ -202,14 +202,334 @@ var FancyChat = {
             styleEl.innerText = cssText;
         }
     }
-}(document, "#fancy-chat{position:fixed;left:50%;top:50%;width:650px;margin-left:-325px;height:450px;margin-top:-225px;z-index:1234;box-shadow:0 0 0 1px #000;}#fancy-chat *{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;margin:0;padding:0}#fancy-chat.hide{display:none}#fancy-chat.block{display:block}#fancy-chat .header{height:80px;box-shadow:0 0 0 1px #000;}#fancy-chat .header span{position:absolute;top:25px;left:50px;font-size:18pt;width:550px;text-align:center}#fancy-chat .header a{position:absolute;right:32px;top:31px;width:25px;height:25px;cursor:pointer;text-align:center;}#fancy-chat .header a#fancy-close{right:5px}#fancy-chat #fancy-messages{margin-top:1px;height:250px;box-shadow:0 0 0 1px #000;overflow-y:auto;}#fancy-chat #fancy-messages .message{overflow:hidden;margin:0}#fancy-chat #fancy-messages .in{background-color:#ebebeb;}#fancy-chat #fancy-messages .in .message{padding-left:10px}#fancy-chat #fancy-messages .out .message{text-align:right;padding-right:10px}#fancy-chat .send{position:relative;height:120px;}#fancy-chat .send #fancy-send{position:absolute;right:8px;top:8px;width:13%;height:104px;line-height:104px;cursor:pointer;display:inline-block;text-align:center;outline:none;border:none;background-color:#d6d6d6;color:#808080;-webkit-border-radius:.25em;-moz-border-radius:.25em;border-radius:.25em;-webkit-user-select:none;-moz-user-select:none;user-select:none}#fancy-chat .send .message{width:550px;margin:0;padding-top:8px;padding-left:8px;}#fancy-chat .send .message textarea{width:100%;height:104px;resize:none;padding:.6em 1em;line-height:1.33;vertical-align:top;outline:none;-webkit-border-radius:.3125em;-moz-border-radius:.3125em;border-radius:.3125em}"));
+}(document, "#fancy-chat {\n" +
+"  position: fixed;\n" +
+"  left: 50%;\n" +
+"  top: 50%;\n" +
+"  width: 650px;\n" +
+"  margin-left: -325px;\n" +
+"  height: 450px;\n" +
+"  margin-top: -225px;\n" +
+"  z-index: 1234;\n" +
+"  box-shadow: 0 0 0 1px #000;\n" +
+"}\n" +
+"#fancy-chat * {\n" +
+"  -webkit-box-sizing: border-box;\n" +
+"  -moz-box-sizing: border-box;\n" +
+"  box-sizing: border-box;\n" +
+"  margin: 0;\n" +
+"  padding: 0;\n" +
+"}\n" +
+"#fancy-chat.hide {\n" +
+"  display: none;\n" +
+"}\n" +
+"#fancy-chat.block {\n" +
+"  display: block;\n" +
+"}\n" +
+"#fancy-chat .header {\n" +
+"  height: 80px;\n" +
+"  box-shadow: 0 0 0 1px #000;\n" +
+"  background-color: #eaeaea;\n" +
+"}\n" +
+"#fancy-chat .header span {\n" +
+"  position: absolute;\n" +
+"  width: 550px;\n" +
+"  top: 25px;\n" +
+"  left: 50px;\n" +
+"  font-size: 18pt;\n" +
+"  text-align: center;\n" +
+"}\n" +
+"#fancy-chat .header a {\n" +
+"  position: absolute;\n" +
+"  right: 32px;\n" +
+"  top: 31px;\n" +
+"  width: 25px;\n" +
+"  height: 25px;\n" +
+"  cursor: pointer;\n" +
+"  text-align: center;\n" +
+"}\n" +
+"#fancy-chat .header a#fancy-close {\n" +
+"  right: 5px;\n" +
+"}\n" +
+"#fancy-chat #fancy-messages {\n" +
+"  margin-top: 1px;\n" +
+"  height: 250px;\n" +
+"  box-shadow: 0 0 0 1px #000;\n" +
+"  overflow-y: auto;\n" +
+"}\n" +
+"#fancy-chat #fancy-messages .message {\n" +
+"  overflow: hidden;\n" +
+"  margin: 0;\n" +
+"}\n" +
+"#fancy-chat #fancy-messages .in {\n" +
+"  background-color: #ebebeb;\n" +
+"}\n" +
+"#fancy-chat #fancy-messages .in .message {\n" +
+"  padding-left: 10px;\n" +
+"}\n" +
+"#fancy-chat #fancy-messages .out .message {\n" +
+"  text-align: right;\n" +
+"  padding-right: 10px;\n" +
+"}\n" +
+"#fancy-chat .send {\n" +
+"  position: relative;\n" +
+"  height: 120px;\n" +
+"}\n" +
+"#fancy-chat .send #fancy-send {\n" +
+"  position: absolute;\n" +
+"  right: 8px;\n" +
+"  top: 8px;\n" +
+"  width: 13%;\n" +
+"  height: 104px;\n" +
+"  line-height: 104px;\n" +
+"  cursor: pointer;\n" +
+"  display: inline-block;\n" +
+"  text-align: center;\n" +
+"  outline: none;\n" +
+"  border: none;\n" +
+"  background-color: #d6d6d6;\n" +
+"  color: #808080;\n" +
+"  -webkit-border-radius: 0.25em;\n" +
+"  -moz-border-radius: 0.25em;\n" +
+"  border-radius: 0.25em;\n" +
+"  -webkit-user-select: none;\n" +
+"  -moz-user-select: none;\n" +
+"  user-select: none;\n" +
+"}\n" +
+"#fancy-chat .send .message {\n" +
+"  width: 550px;\n" +
+"  margin: 0;\n" +
+"  padding-top: 8px;\n" +
+"  padding-left: 8px;\n" +
+"}\n" +
+"#fancy-chat .send .message textarea {\n" +
+"  width: 100%;\n" +
+"  height: 104px;\n" +
+"  resize: none;\n" +
+"  padding: 0.6em 1em;\n" +
+"  line-height: 1.33;\n" +
+"  vertical-align: top;\n" +
+"  outline: none;\n" +
+"  -webkit-border-radius: 0.3125em;\n" +
+"  -moz-border-radius: 0.3125em;\n" +
+"  border-radius: 0.3125em;\n" +
+"}\n" +
+"\n" +
+"@media only screen and (max-width: 1030px) and (orientation: landscape) {\n" +
+"  #fancy-chat {\n" +
+"    width: 650px;\n" +
+"    margin-left: -325px;\n" +
+"    height: 385px;\n" +
+"    margin-top: -192.5px;\n" +
+"  }\n" +
+"  #fancy-chat .header {\n" +
+"    height: 60px;\n" +
+"  }\n" +
+"  #fancy-chat .header span {\n" +
+"    top: 14px;\n" +
+"  }\n" +
+"  #fancy-chat .header a {\n" +
+"    top: 21px;\n" +
+"  }\n" +
+"  #fancy-chat #fancy-messages {\n" +
+"    height: 210px;\n" +
+"  }\n" +
+"  #fancy-chat .send #fancy-send {\n" +
+"    height: 100px;\n" +
+"  }\n" +
+"  #fancy-chat .send .message textarea {\n" +
+"    height: 100px;\n" +
+"  }\n" +
+"}\n" +
+"@media only screen and (max-width: 600px) and (orientation: portrait) {\n" +
+"  #fancy-chat {\n" +
+"    width: 590px;\n" +
+"    margin-left: -295px;\n" +
+"    height: 450px;\n" +
+"    margin-top: -225px;\n" +
+"  }\n" +
+"  #fancy-chat .header span {\n" +
+"    width: 384px;\n" +
+"    left: 103px;\n" +
+"  }\n" +
+"  #fancy-chat .send .message {\n" +
+"    width: 496px;\n" +
+"  }\n" +
+"}\n" +
+"@media only screen and (max-width: 600px) and (orientation: landscape) {\n" +
+"  #fancy-chat {\n" +
+"    width: 590px;\n" +
+"    margin-left: -295px;\n" +
+"    height: 350px;\n" +
+"    margin-top: -175px;\n" +
+"  }\n" +
+"  #fancy-chat .header {\n" +
+"    height: 60px;\n" +
+"  }\n" +
+"  #fancy-chat .header span {\n" +
+"    width: 384px;\n" +
+"    left: 103px;\n" +
+"    top: 14px;\n" +
+"  }\n" +
+"  #fancy-chat .header a {\n" +
+"    top: 21px;\n" +
+"  }\n" +
+"  #fancy-chat #fancy-messages {\n" +
+"    height: 170px;\n" +
+"  }\n" +
+"  #fancy-chat .send .message {\n" +
+"    width: 496px;\n" +
+"  }\n" +
+"}\n" +
+"@media only screen and (max-width: 568px) and (orientation: landscape) {\n" +
+"  #fancy-chat {\n" +
+"    width: 560px;\n" +
+"    margin-left: -280px;\n" +
+"    height: 250px;\n" +
+"    margin-top: -125px;\n" +
+"  }\n" +
+"  #fancy-chat .header {\n" +
+"    height: 60px;\n" +
+"  }\n" +
+"  #fancy-chat .header span {\n" +
+"    width: 366px;\n" +
+"    left: 97px;\n" +
+"    top: 14px;\n" +
+"  }\n" +
+"  #fancy-chat .header a {\n" +
+"    top: 21px;\n" +
+"  }\n" +
+"  #fancy-chat #fancy-messages {\n" +
+"    height: 100px;\n" +
+"  }\n" +
+"  #fancy-chat .send {\n" +
+"    height: 85px;\n" +
+"  }\n" +
+"  #fancy-chat .send #fancy-send {\n" +
+"    right: 5px;\n" +
+"    top: 5px;\n" +
+"    width: 75px;\n" +
+"    height: 80px;\n" +
+"    line-height: 80px;\n" +
+"  }\n" +
+"  #fancy-chat .send .message {\n" +
+"    width: 474px;\n" +
+"    padding-left: 5px;\n" +
+"    padding-top: 5px;\n" +
+"  }\n" +
+"  #fancy-chat .send .message textarea {\n" +
+"    height: 80px;\n" +
+"  }\n" +
+"}\n" +
+"@media only screen and (max-width: 480px) and (orientation: landscape) {\n" +
+"  #fancy-chat {\n" +
+"    width: 460px;\n" +
+"    margin-left: -230px;\n" +
+"    height: 250px;\n" +
+"    margin-top: -125px;\n" +
+"  }\n" +
+"  #fancy-chat .header {\n" +
+"    height: 60px;\n" +
+"  }\n" +
+"  #fancy-chat .header span {\n" +
+"    width: 300px;\n" +
+"    left: 80px;\n" +
+"    top: 14px;\n" +
+"  }\n" +
+"  #fancy-chat .header a {\n" +
+"    top: 21px;\n" +
+"  }\n" +
+"  #fancy-chat #fancy-messages {\n" +
+"    height: 100px;\n" +
+"  }\n" +
+"  #fancy-chat .send {\n" +
+"    height: 85px;\n" +
+"  }\n" +
+"  #fancy-chat .send #fancy-send {\n" +
+"    right: 5px;\n" +
+"    top: 5px;\n" +
+"    width: 75px;\n" +
+"    height: 80px;\n" +
+"    line-height: 80px;\n" +
+"  }\n" +
+"  #fancy-chat .send .message {\n" +
+"    width: 375px;\n" +
+"    padding-left: 5px;\n" +
+"    padding-top: 5px;\n" +
+"  }\n" +
+"  #fancy-chat .send .message textarea {\n" +
+"    height: 80px;\n" +
+"  }\n" +
+"}\n" +
+"@media only screen and (max-width: 384px) and (min-width: 321px) {\n" +
+"  #fancy-chat {\n" +
+"    width: 375px;\n" +
+"    margin-left: -187.5px;\n" +
+"    height: 590px;\n" +
+"    margin-top: -295px;\n" +
+"  }\n" +
+"  #fancy-chat .header span {\n" +
+"    width: 250px;\n" +
+"    left: 67px;\n" +
+"  }\n" +
+"  #fancy-chat #fancy-messages {\n" +
+"    height: 395px;\n" +
+"  }\n" +
+"  #fancy-chat .send #fancy-send {\n" +
+"    right: 5px;\n" +
+"    top: 5px;\n" +
+"    width: 65px;\n" +
+"  }\n" +
+"  #fancy-chat .send .message {\n" +
+"    width: 300px;\n" +
+"    padding-left: 5px;\n" +
+"    padding-top: 5px;\n" +
+"  }\n" +
+"}\n" +
+"@media only screen and (max-width: 320px) {\n" +
+"  #fancy-chat {\n" +
+"    width: 310px;\n" +
+"    margin-left: -155px;\n" +
+"    height: 400px;\n" +
+"    margin-top: -200px;\n" +
+"  }\n" +
+"  #fancy-chat .header {\n" +
+"    height: 60px;\n" +
+"  }\n" +
+"  #fancy-chat .header span {\n" +
+"    width: 200px;\n" +
+"    left: 55px;\n" +
+"    top: 14px;\n" +
+"  }\n" +
+"  #fancy-chat .header a {\n" +
+"    top: 21px;\n" +
+"  }\n" +
+"  #fancy-chat .send {\n" +
+"    height: 85px;\n" +
+"  }\n" +
+"  #fancy-chat .send #fancy-send {\n" +
+"    right: 5px;\n" +
+"    top: 5px;\n" +
+"    width: 50px;\n" +
+"    height: 80px;\n" +
+"    line-height: 80px;\n" +
+"  }\n" +
+"  #fancy-chat .send .message {\n" +
+"    width: 250px;\n" +
+"    padding-left: 5px;\n" +
+"    padding-top: 5px;\n" +
+"  }\n" +
+"  #fancy-chat .send .message textarea {\n" +
+"    height: 80px;\n" +
+"  }\n" +
+"}"));
 
 FancyChat.templates = {};
 FancyChat["templates"]["chat"] = function anonymous(it) {
 var out='<div id="fancy-messages"></div><div class="send"><div class="message"><textarea id="fancy-message" placeholder="batman"></textarea></div><div id="fancy-send">Send</div></div>';return out;
 };
 FancyChat["templates"]["convos"] = function anonymous(it) {
-var out='<div id="fancy-convos">';var arr1=it;if(arr1){var v,k=-1,l1=arr1.length-1;while(k<l1){v=arr1[k+=1];out+='<div class="convo" data-id="'+( k )+'">'+( v.content )+'</div>';} } out+='</div>';return out;
+var out='<div id="fancy-convos">';var arr1=it;if(arr1){var v,k=-1,l1=arr1.length-1;while(k<l1){v=arr1[k+=1];out+='<div class="convo" data-id="'+( k )+'">'+( v.content ||'').toString().encodeHTML()+'</div>';} } out+='</div>';return out;
 };
 FancyChat["templates"]["header"] = function anonymous(it) {
 var out='<span>'+( it.title )+'</span><a id="fancy-newchats">'+( it.which )+'</a><a id="fancy-close">X</a>';return out;

@@ -32,12 +32,12 @@ gulp.task('dot', function() {
 gulp.task('css', function() {
 	return gulp.src(paths.css)
 		.pipe(stylus({
-			errors: true,
-			compress: true
+			errors: true
+			//compress: true
 		}))
 		.pipe(concat('fancycss.css'))
 		.pipe(css2js({
-			splitOnNewLine: false
+			//splitOnNewLine: false
 		}))
 		.pipe(gulp.dest('src/js/'));
 });
@@ -66,7 +66,8 @@ gulp.task('transitionals', function() {
 });
 
 gulp.task('build', function() {
-	run('clean', 'dot', 'css', 'combine', 'watch');
+	// remove clean for now, some shit windows error or something
+	run('dot', 'css', 'combine', 'watch');
 });
 
 gulp.task('watch', function() {
