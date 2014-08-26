@@ -4,10 +4,11 @@ var FancyChat = {
 	convos: null,
 	current: null,
 	conversations: [],
+	url: 'http://api.fancysupport.com:4000/',
 
 	cache: function() {
 		// dummy data
-		for(var i=1; i<5; i++) {
+		for (var i=1; i<5; i++) {
 			var data = {
 				customer: 123,
 				direction: 'in',
@@ -16,7 +17,7 @@ var FancyChat = {
 				replies: []
 			};
 
-			for(var j=0; j<15; j++) {
+			for (var j=0; j<15; j++) {
 				var reply = {
 					customer: i,
 					direction: Math.random() > 0.5 ? 'in' : 'out',
@@ -35,6 +36,25 @@ var FancyChat = {
 		var self = this;
 		// TODO options
 
+		if ( ! options.signature)
+			throw "Fancy needs a customer signature.";
+
+		if ( ! options.app_key)
+			throw "Fancy needs a application key.";
+
+		var impression = {
+			signature: options.signature,
+			app_key: options.app_key
+		};
+
+		atomic.post(this.url + 'impression', impression)
+			.success(function(data, xhr) {
+				console.log('success', data, xhr);
+			})
+			.error(function(data, xhr) {
+				console.log('error', data, xhr);
+			});
+
 		document.querySelector(options.activator)
 		.addEventListener('click', function() {
 			self.renderWidget();
@@ -50,15 +70,15 @@ var FancyChat = {
 		}
 		String.prototype.encodeHTML = encodeHTMLSource();
 
-		this.cache();
+		//this.cache();
 	},
 
 	onSendClick: function() {
 		var message = this.msgBox.value;
 		this.msgBox.value = '';
 
-		if(message !== '') {
-			if(this.current) { // replying to an existing conversation
+		if (message !== '') {
+			if (this.current) { // replying to an existing conversation
 				var reply = {
 					customer: 'me', // FIXME
 					sender: 'me', // FIXME
@@ -104,7 +124,7 @@ var FancyChat = {
 		};
 
 		var convos = document.querySelectorAll('.convo');
-		for(var i=0; i<convos.length; i++) {
+		for (var i=0; i<convos.length; i++) {
 			convos[i].addEventListener('click', fn);
 		}
 	},
@@ -113,7 +133,7 @@ var FancyChat = {
 		// append the widget to the end of the body, check to make sure
 		// it hasn't already been created, if it has, recreate
 		var div = document.getElementById('fancy-chat');
-		if(!div) {
+		if ( ! div) {
 			div = document.createElement('div');
 			div.id = 'fancy-chat';
 			document.body.appendChild(div);

@@ -1,4 +1,5 @@
 var gulp = require('gulp');
+var gutil = require('gulp-util');
 var concat = require('gulp-concat');
 var header = require('gulp-header');
 var clean = require('gulp-clean');
@@ -7,7 +8,10 @@ var run = require('run-sequence');
 var uglify = require('gulp-uglify');
 var stylus = require('gulp-stylus');
 var css2js = require('gulp-css2js');
-
+var http = require('http');
+var livereload = require('gulp-livereload');
+var ecstatic = require('ecstatic');
+var notifier = require('node-notifier');
 
 var paths = {
 	scripts: ['src/js/**/*.js', '!src/js/dot.min.js'],
@@ -15,6 +19,22 @@ var paths = {
 	css: ['src/css/**/*.styl', 'src/css/**/*.css'],
 	dist: 'build'
 };
+
+var handle_error = function(e) {
+	gutil.log(gutil.colors.red(e.message));
+	if (e.fileName) gutil.log(gutil.colors.red(e.fileName));
+
+	var n = new notifier();
+	n.notify({title: 'Fancy Build Error', message: e.message});
+};
+
+gulp.task('http', function() {
+	http.createServer(
+		ecstatic({ root: __dirname + '/' + paths.dist })
+	).listen(3000);
+
+	gutil.log('HTTP listening on', gutil.colors.yellow('3000'));
+});
 
 gulp.task('dot', function() {
 	var options = {
@@ -30,11 +50,15 @@ gulp.task('dot', function() {
 });
 
 gulp.task('css', function() {
+	var s = stylus({errors: true, compress: false, 'include css': true})
+		.on('error', function(e) {
+			handle_error(e);
+			s.end();
+			return false;
+		});
+
 	return gulp.src(paths.css)
-		.pipe(stylus({
-			errors: true
-			//compress: true
-		}))
+		.pipe(s)
 		.pipe(concat('fancycss.css'))
 		.pipe(css2js({
 			//splitOnNewLine: false
@@ -74,6 +98,10 @@ gulp.task('watch', function() {
 	gulp.watch(paths.scripts, ['combine']);
 	gulp.watch(paths.dot, ['dot']);
 	gulp.watch(paths.css, ['css']);
+
+	gulp.watch(paths.dist).on('change', function(f) {
+		livereload().changed(f.path);
+	});
 });
 
-gulp.task('default', ['build']);
+gulp.task('default', ['http', 'build']);

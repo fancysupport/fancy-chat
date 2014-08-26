@@ -1,5 +1,80 @@
-/*! atomic v1.0.0 | (c) 2014 @toddmotto | github.com/toddmotto/atomic */
-!function(a,b){"function"==typeof define&&define.amd?define(b):"object"==typeof exports?module.exports=b:a.atomic=b(a)}(this,function(a){"use strict";var b={},c=function(a){var b;try{b=JSON.parse(a.responseText)}catch(c){b=a.responseText}return[b,a]},d=function(b,d,e){var f={success:function(){},error:function(){}},g=a.XMLHttpRequest||ActiveXObject,h=new g("MSXML2.XMLHTTP.3.0");return h.open(b,d,!0),h.setRequestHeader("Content-type","application/x-www-form-urlencoded"),h.onreadystatechange=function(){4===h.readyState&&(200===h.status?f.success.apply(f,c(h)):f.error.apply(f,c(h)))},h.send(e),{success:function(a){return f.success=a,f},error:function(a){return f.error=a,f}}};return b.get=function(a){return d("GET",a)},b.put=function(a,b){return d("PUT",a,b)},b.post=function(a,b){return d("POST",a,b)},b["delete"]=function(a){return d("DELETE",a)},b});
+(function (root, factory) {
+  if (typeof define === 'function' && define.amd) {
+    define(factory);
+  } else if (typeof exports === 'object') {
+    module.exports = factory;
+  } else {
+    root.atomic = factory(root);
+  }
+})(this, function (root) {
+
+  'use strict';
+
+  var exports = {};
+
+  var parse = function (req) {
+    var result;
+    try {
+      result = JSON.parse(req.responseText);
+    } catch (e) {
+      result = req.responseText;
+    }
+    return [result, req];
+  };
+
+  var xhr = function (type, url, data) {
+    var methods = {
+      success: function () {},
+      error: function () {}
+    };
+    var XHR = root.XMLHttpRequest || XDomainRequest;
+    var request = new XHR('MSXML2.XMLHTTP.3.0');
+    request.withCredentials = true;
+    request.open(type, url, true);
+    request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    request.onreadystatechange = function () {
+      if (request.readyState === 4) {
+        if (request.status >= 200 && request.status < 300) {
+          methods.success.apply(methods, parse(request));
+        } else {
+          methods.error.apply(methods, parse(request));
+        }
+      }
+    };
+    request.send(data);
+    var callbacks = {
+      success: function (callback) {
+        methods.success = callback;
+        return callbacks;
+      },
+      error: function (callback) {
+        methods.error = callback;
+        return callbacks;
+      }
+    };
+
+    return callbacks;
+  };
+
+  exports['get'] = function (src) {
+    return xhr('GET', src);
+  };
+
+  exports['put'] = function (url, data) {
+    return xhr('PUT', url, data);
+  };
+
+  exports['post'] = function (url, data) {
+    return xhr('POST', url, data);
+  };
+
+  exports['delete'] = function (url) {
+    return xhr('DELETE', url);
+  };
+
+  return exports;
+
+});
 
 var FancyChat = {
 	msgBox: null,
@@ -7,10 +82,11 @@ var FancyChat = {
 	convos: null,
 	current: null,
 	conversations: [],
+	url: 'http://api.fancysupport.com:4000/',
 
 	cache: function() {
 		// dummy data
-		for(var i=1; i<5; i++) {
+		for (var i=1; i<5; i++) {
 			var data = {
 				customer: 123,
 				direction: 'in',
@@ -19,7 +95,7 @@ var FancyChat = {
 				replies: []
 			};
 
-			for(var j=0; j<15; j++) {
+			for (var j=0; j<15; j++) {
 				var reply = {
 					customer: i,
 					direction: Math.random() > 0.5 ? 'in' : 'out',
@@ -38,6 +114,25 @@ var FancyChat = {
 		var self = this;
 		// TODO options
 
+		if ( ! options.signature)
+			throw "Fancy needs a customer signature.";
+
+		if ( ! options.app_key)
+			throw "Fancy needs a application key.";
+
+		var impression = {
+			signature: options.signature,
+			app_key: options.app_key
+		};
+
+		atomic.post(this.url + 'impression', impression)
+			.success(function(data, xhr) {
+				console.log('success', data, xhr);
+			})
+			.error(function(data, xhr) {
+				console.log('error', data, xhr);
+			});
+
 		document.querySelector(options.activator)
 		.addEventListener('click', function() {
 			self.renderWidget();
@@ -53,15 +148,15 @@ var FancyChat = {
 		}
 		String.prototype.encodeHTML = encodeHTMLSource();
 
-		this.cache();
+		//this.cache();
 	},
 
 	onSendClick: function() {
 		var message = this.msgBox.value;
 		this.msgBox.value = '';
 
-		if(message !== '') {
-			if(this.current) { // replying to an existing conversation
+		if (message !== '') {
+			if (this.current) { // replying to an existing conversation
 				var reply = {
 					customer: 'me', // FIXME
 					sender: 'me', // FIXME
@@ -107,7 +202,7 @@ var FancyChat = {
 		};
 
 		var convos = document.querySelectorAll('.convo');
-		for(var i=0; i<convos.length; i++) {
+		for (var i=0; i<convos.length; i++) {
 			convos[i].addEventListener('click', fn);
 		}
 	},
@@ -116,7 +211,7 @@ var FancyChat = {
 		// append the widget to the end of the body, check to make sure
 		// it hasn't already been created, if it has, recreate
 		var div = document.getElementById('fancy-chat');
-		if(!div) {
+		if ( ! div) {
 			div = document.createElement('div');
 			div.id = 'fancy-chat';
 			document.body.appendChild(div);
