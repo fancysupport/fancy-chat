@@ -1,88 +1,94 @@
 (function (root, factory) {
-  if (typeof define === 'function' && define.amd) {
-    define(factory);
-  } else if (typeof exports === 'object') {
-    module.exports = factory;
-  } else {
-    root.atomic = factory(root);
-  }
+	if (typeof define === 'function' && define.amd) {
+		define(factory);
+	} else if (typeof exports === 'object') {
+		module.exports = factory;
+	} else {
+		root.atomic = factory(root);
+	}
 })(this, function (root) {
 
-  'use strict';
+	'use strict';
 
-  var exports = {};
+	var exports = {};
 
-  var parse = function (req) {
-    var result;
-    try {
-      result = JSON.parse(req.responseText);
-    } catch (e) {
-      result = req.responseText;
-    }
-    return [result, req];
-  };
+	var parse = function (req) {
+		var result;
+		try {
+			result = JSON.parse(req.responseText);
+		} catch (e) {
+			result = req.responseText;
+		}
+		return [result, req];
+	};
 
-  var xhr = function (type, url, data) {
-    var methods = {
-      success: function () {},
-      error: function () {}
-    };
-    var XHR = root.XMLHttpRequest || XDomainRequest;
-    var request = new XHR('MSXML2.XMLHTTP.3.0');
-    request.withCredentials = true;
-    request.open(type, url, true);
-    request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-    request.onreadystatechange = function () {
-      if (request.readyState === 4) {
-        if (request.status >= 200 && request.status < 300) {
-          methods.success.apply(methods, parse(request));
-        } else {
-          methods.error.apply(methods, parse(request));
-        }
-      }
-    };
-    request.send(data);
-    var callbacks = {
-      success: function (callback) {
-        methods.success = callback;
-        return callbacks;
-      },
-      error: function (callback) {
-        methods.error = callback;
-        return callbacks;
-      }
-    };
+	var xhr = function (type, url, data, json) {
+		var methods = {
+			success: function () {},
+			error: function () {}
+		};
+		var XHR = root.XMLHttpRequest || XDomainRequest;
+		var request = new XHR('MSXML2.XMLHTTP.3.0');
+		request.withCredentials = true;
+		request.open(type, url, true);
 
-    return callbacks;
-  };
+		if (json) {
+			request.setRequestHeader('Content-type', 'application/json');
+			data = JSON.stringify(data);
+		} else
+			request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+		
+		request.onreadystatechange = function () {
+			if (request.readyState === 4) {
+				if (request.status >= 200 && request.status < 300) {
+					methods.success.apply(methods, parse(request));
+				} else {
+					methods.error.apply(methods, parse(request));
+				}
+			}
+		};
+		request.send(data);
+		var callbacks = {
+			success: function (callback) {
+				methods.success = callback;
+				return callbacks;
+			},
+			error: function (callback) {
+				methods.error = callback;
+				return callbacks;
+			}
+		};
 
-  exports['get'] = function (src) {
-    return xhr('GET', src);
-  };
+		return callbacks;
+	};
 
-  exports['put'] = function (url, data) {
-    return xhr('PUT', url, data);
-  };
+	exports['get'] = function (src) {
+		return xhr('GET', src);
+	};
 
-  exports['post'] = function (url, data) {
-    return xhr('POST', url, data);
-  };
+	exports['put'] = function (url, data, json) {
+		return xhr('PUT', url, data, json);
+	};
 
-  exports['delete'] = function (url) {
-    return xhr('DELETE', url);
-  };
+	exports['post'] = function (url, data, json) {
+		return xhr('POST', url, data, json);
+	};
 
-  return exports;
+	exports['delete'] = function (url) {
+		return xhr('DELETE', url);
+	};
+
+	return exports;
 
 });
 
-var FancyChat = {
+var FancySupport = {
 	msgBox: null,
 	chat: null,
 	convos: null,
 	current: null,
 	conversations: [],
-	url: 'http://api.fancysupport.com:4000/',
+	url: 'http://api.fancysupport.com:4000',
 
 	cache: function() {
 		// dummy data
@@ -110,33 +116,25 @@ var FancyChat = {
 		}
 	},
 
-	init: function(options) {
-		var self = this;
-		// TODO options
+	build_query_string: function(obj) {
+		var s = [];
+		for (var p in obj) {
+			if (obj.hasOwnProperty(p) && obj[p] !== undefined) {
+				s.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+			}
+		}
+		return s.join("&");
+	},
 
-		if ( ! options.signature)
-			throw "Fancy needs a customer signature.";
+	init: function() {
+		var that = this;
 
-		if ( ! options.app_key)
-			throw "Fancy needs a application key.";
+		this.impression();
 
-		var impression = {
-			signature: options.signature,
-			app_key: options.app_key
-		};
-
-		atomic.post(this.url + 'impression', impression)
-			.success(function(data, xhr) {
-				console.log('success', data, xhr);
-			})
-			.error(function(data, xhr) {
-				console.log('error', data, xhr);
-			});
-
-		document.querySelector(options.activator)
+		document.querySelector(FancyUser.activator)
 		.addEventListener('click', function() {
-			self.renderWidget();
-			self.renderChat();
+			that.renderWidget();
+			that.renderChat();
 		});
 
 		function encodeHTMLSource() {
@@ -149,6 +147,30 @@ var FancyChat = {
 		String.prototype.encodeHTML = encodeHTMLSource();
 
 		//this.cache();
+	},
+
+	impression: function() {
+		if ( ! FancyUser)
+			throw "Fancy needs a FancyUser object to run.";
+
+		if ( ! FancyUser.signature)
+			throw "FancyUser needs a customer signature.";
+
+		if ( ! FancyUser.app_key)
+			throw "FancyUser needs a application key.";
+
+		var impression = this.build_query_string({
+			signature: FancyUser.signature,
+			app_key: FancyUser.app_key,
+			customer_id: FancyUser.customer_id,
+			name: FancyUser.name,
+			email: FancyUser.email,
+			phone: FancyUser.phone
+		});
+
+		this.ajax({method: 'post', url: '/impression', data: impression}, function(ok, err) {
+			console.log(ok, err);
+		});
 	},
 
 	onSendClick: function() {
@@ -167,14 +189,19 @@ var FancyChat = {
 				this.current.replies.push(reply);
 			} else {  // creating a new conversation
 				this.current = {
-					customer: 'me', // FIXME
+					customer_id: FancyUser.customer_id,
+					customer_name: FancyUser.name,
 					sender: 'me', // FIXME
-					direction: 'in',
+					direction: 'in', // FIXME
+					incomming: true,
 					content: message,
 					replies: []
 				};
 
 				this.conversations.push(this.current);
+				this.ajax({method: 'post', url: '/messages', data: this.current, json: true}, function(ok, err) {
+					console.log(ok, err);
+				});
 			}
 
 			this.renderMessages(this.current);
@@ -189,16 +216,16 @@ var FancyChat = {
 
 		this.current = null;
 
-		var self = this;
+		var that = this;
 
 		var fn = function() {
 			// TODO check for new data?
 
 			var id = this.getAttribute("data-id");
-			self.current = self.conversations[id];
+			that.current = that.conversations[id];
 
-			self.renderChat();
-			self.renderMessages(self.current);
+			that.renderChat();
+			that.renderMessages(that.current);
 		};
 
 		var convos = document.querySelectorAll('.convo');
@@ -224,7 +251,7 @@ var FancyChat = {
 	},
 
 	renderHeader: function(data) {
-		var self = this;
+		var that = this;
 		var div = document.querySelector('#fancy-chat .header');
 
 		div.innerHTML = this.templates.header(data);
@@ -232,21 +259,21 @@ var FancyChat = {
 		var btnClose = document.getElementById('fancy-close');
 		var btnNewChats = document.getElementById('fancy-newchats');
 
-		var chatsFn = function() { self.onChatsClick(); };
+		var chatsFn = function() { that.onChatsClick(); };
 		var newFn = function() {
-			self.current = null;
-			self.renderChat();
+			that.current = null;
+			that.renderChat();
 		};
 
 		btnNewChats.addEventListener('click', data.which == 'new' ? newFn : chatsFn);
 
 		btnClose.addEventListener('click', function() {
-			self.removeWidget();
+			that.removeWidget();
 		});
 	},
 
 	renderChat: function() {
-		var self = this;
+		var that = this;
 
 		this.renderHeader({title: 'new chat', which: 'chats'});
 
@@ -258,7 +285,7 @@ var FancyChat = {
 		this.messages = document.getElementById('fancy-messages');
 
 		btnSend.addEventListener('click', function() {
-			self.onSendClick();
+			that.onSendClick();
 		});
 	},
 
@@ -280,8 +307,22 @@ var FancyChat = {
 		document.body.removeChild(document.getElementById('fancy-chat'));
 		this.messages = null;
 		this.msgBox = null;
+	},
+
+	ajax: function(opts, cb) {
+		var fn = function(data, xhr) {
+			cb({code: xhr.status, data: data});
+		};
+
+		atomic[opts.method](this.url+opts.url, opts.data, opts.json)
+			.success(fn)
+			.error(fn);
 	}
 };
+
+(function(root) {
+	root.FancySupport.init();
+})(this);
 
 (function (doc, cssText) {
     var styleEl = doc.createElement("style");
@@ -619,19 +660,19 @@ var FancyChat = {
 "  }\n" +
 "}"));
 
-FancyChat.templates = {};
-FancyChat["templates"]["chat"] = function anonymous(it) {
+FancySupport.templates = {};
+FancySupport["templates"]["chat"] = function anonymous(it) {
 var out='<div id="fancy-messages"></div><div class="send"><div class="message"><textarea id="fancy-message" placeholder="batman"></textarea></div><div id="fancy-send">Send</div></div>';return out;
 };
-FancyChat["templates"]["convos"] = function anonymous(it) {
+FancySupport["templates"]["convos"] = function anonymous(it) {
 var out='<div id="fancy-convos">';var arr1=it;if(arr1){var v,k=-1,l1=arr1.length-1;while(k<l1){v=arr1[k+=1];out+='<div class="convo" data-id="'+( k )+'">'+( v.content ||'').toString().encodeHTML()+'</div>';} } out+='</div>';return out;
 };
-FancyChat["templates"]["header"] = function anonymous(it) {
+FancySupport["templates"]["header"] = function anonymous(it) {
 var out='<span>'+( it.title )+'</span><a id="fancy-newchats">'+( it.which )+'</a><a id="fancy-close">X</a>';return out;
 };
-FancyChat["templates"]["messages"] = function anonymous(it) {
+FancySupport["templates"]["messages"] = function anonymous(it) {
 var out=''; var prev = it.direction; out+='<div class="'+( it.direction )+'"><p class="message">'+( it.content ||'').toString().encodeHTML()+'</p>';var arr1=it.replies;if(arr1){var m,i1=-1,l1=arr1.length-1;while(i1<l1){m=arr1[i1+=1];if(m.direction === prev){out+='<p class="message">'+( m.content ||'').toString().encodeHTML()+'</p>';}else{out+='</div><div class="'+( m.direction )+'"><p class="message">'+( m.content ||'').toString().encodeHTML()+'</p>';} prev = m.direction; } } out+='</div>';return out;
 };
-FancyChat["templates"]["widget"] = function anonymous(it) {
+FancySupport["templates"]["widget"] = function anonymous(it) {
 var out='<div class="header"></div><div class="body"><div class="chat"></div><div class="convos"></div></div>';return out;
 };

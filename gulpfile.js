@@ -31,21 +31,21 @@ var handle_error = function(e) {
 gulp.task('http', function() {
 	http.createServer(
 		ecstatic({ root: __dirname + '/' + paths.dist })
-	).listen(3000);
+	).listen(3001);
 
-	gutil.log('HTTP listening on', gutil.colors.yellow('3000'));
+	gutil.log('HTTP listening on', gutil.colors.yellow('3001'));
 });
 
 gulp.task('dot', function() {
 	var options = {
-		dictionary: 'FancyChat["templates"]',
+		dictionary: 'FancySupport["templates"]',
 		varname: 'it'
 	};
 
 	return gulp.src(paths.dot)
 		.pipe(dot(options))
 		.pipe(concat('templates.js'))
-		.pipe(header('FancyChat.templates = {};\n'))
+		.pipe(header('FancySupport.templates = {};\n'))
 		.pipe(gulp.dest('src/js'));
 });
 
@@ -68,7 +68,7 @@ gulp.task('css', function() {
 
 gulp.task('combine', function() {
 	return gulp.src(paths.scripts)
-		.pipe(concat('fancy-chat.js'))
+		.pipe(concat('client.js'))
 		//.pipe(uglify())
 		.pipe(gulp.dest(paths.dist));
 });
@@ -90,16 +90,17 @@ gulp.task('transitionals', function() {
 });
 
 gulp.task('build', function() {
-	// remove clean for now, some shit windows error or something
 	run('dot', 'css', 'combine', 'watch');
 });
 
 gulp.task('watch', function() {
+	livereload.listen();
+
 	gulp.watch(paths.scripts, ['combine']);
 	gulp.watch(paths.dot, ['dot']);
 	gulp.watch(paths.css, ['css']);
 
-	gulp.watch(paths.dist).on('change', function(f) {
+	gulp.watch(paths.dist + '/*').on('change', function(f) {
 		livereload().changed(f.path);
 	});
 });
