@@ -2,18 +2,21 @@
 	<p class="message">{{! param.content }}</p>
 #}}
 
-{{ var prev = it.direction; }}
-	<div class="{{= it.direction }}">
-		{{#def.message:it}}
+{{##def.container:param:
+	<div class="{{? param.incoming === true }}in{{??}}out{{?}}">
+		{{#def.message:param}}
+#}}
+
+{{ var prev = it.incoming; }}
+	{{#def.container:it}}
 
 {{~ it.replies :m }}
-	{{? m.direction === prev }}
+	{{? m.incoming === prev }}
 		{{#def.message:m}}
 	{{??}}
-		</div><div class="{{= m.direction }}">
-			{{#def.message:m}}
+		</div>{{#def.container:m}}
 	{{?}}
-	{{ prev = m.direction; }}
+	{{ prev = m.incoming; }}
 
 {{~}}
 </div>

@@ -1,0 +1,11 @@
+{{##def.listing:
+	<div class="listing" data-id="{{= k }}">
+		{{! v.content }}
+	</div>
+#}}
+
+<div id="fancy-listings">
+	{{~ it :v:k }}
+		{{#def.listing}}
+	{{~}}
+</div>

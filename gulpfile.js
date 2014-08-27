@@ -14,7 +14,7 @@ var ecstatic = require('ecstatic');
 var notifier = require('node-notifier');
 
 var paths = {
-	scripts: ['src/js/**/*.js', '!src/js/dot.min.js'],
+	scripts: ['src/js/**/*.js', '!src/js/dot.min.js', '!src/js/atomic.js'],
 	dot: ['src/views/**/*.dot', 'src/views/**/*.def', 'src/views/**/*.jst'],
 	css: ['src/css/**/*.styl', 'src/css/**/*.css'],
 	dist: 'build'
@@ -31,26 +31,26 @@ var handle_error = function(e) {
 gulp.task('http', function() {
 	http.createServer(
 		ecstatic({ root: __dirname + '/' + paths.dist })
-	).listen(3000);
+	).listen(3001);
 
-	gutil.log('HTTP listening on', gutil.colors.yellow('3000'));
+	gutil.log('HTTP listening on', gutil.colors.yellow('3001'));
 });
 
 gulp.task('dot', function() {
 	var options = {
-		dictionary: 'FancyChat["templates"]',
+		dictionary: 'FancySupport["templates"]',
 		varname: 'it'
 	};
 
 	return gulp.src(paths.dot)
 		.pipe(dot(options))
 		.pipe(concat('templates.js'))
-		.pipe(header('FancyChat.templates = {};\n'))
+		.pipe(header('FancySupport.templates = {};\n'))
 		.pipe(gulp.dest('src/js'));
 });
 
 gulp.task('css', function() {
-	var s = stylus({errors: true, compress: false, 'include css': true})
+	var s = stylus({errors: true, compress: true, 'include css': true})
 		.on('error', function(e) {
 			handle_error(e);
 			s.end();
@@ -61,15 +61,15 @@ gulp.task('css', function() {
 		.pipe(s)
 		.pipe(concat('fancycss.css'))
 		.pipe(css2js({
-			//splitOnNewLine: false
+			splitOnNewLine: false
 		}))
 		.pipe(gulp.dest('src/js/'));
 });
 
 gulp.task('combine', function() {
 	return gulp.src(paths.scripts)
-		.pipe(concat('fancy-chat.js'))
-		//.pipe(uglify())
+		.pipe(concat('client.js'))
+		.pipe(uglify())
 		.pipe(gulp.dest(paths.dist));
 });
 
@@ -90,16 +90,17 @@ gulp.task('transitionals', function() {
 });
 
 gulp.task('build', function() {
-	// remove clean for now, some shit windows error or something
 	run('dot', 'css', 'combine', 'watch');
 });
 
 gulp.task('watch', function() {
+	livereload.listen();
+
 	gulp.watch(paths.scripts, ['combine']);
 	gulp.watch(paths.dot, ['dot']);
 	gulp.watch(paths.css, ['css']);
 
-	gulp.watch(paths.dist).on('change', function(f) {
+	gulp.watch(paths.dist + '/*').on('change', function(f) {
 		livereload().changed(f.path);
 	});
 });

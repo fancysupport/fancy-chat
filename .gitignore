@@ -3,7 +3,7 @@
 Thumbs.db
 
 sftp-config.json
-*.sublime-workspace
+*.sublime-*
 node_modules/
 
 src/js/fancycss.js
