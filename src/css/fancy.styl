@@ -34,12 +34,6 @@ box-sizing()
 		margin 0
 		padding 0
 
-	&.hide
-		display none
-
-	&.block
-		display block
-
 	.header
 		height 80px
 		box-shadow 0 0 0 1px black
@@ -65,25 +59,16 @@ box-sizing()
 			&#fancy-close
 				right 5px
 
-	#fancy-messages
+	#fancy-listings
+		height 369px
 		margin-top 1px
-		height 250px
-		box-shadow 0 0 0 1px black
 		overflow-y auto
 
-		.message
-			overflow hidden
-			margin 0
+		.listing
+			cursor pointer
 
-		.in
-			background-color #EBEBEB
-
-			.message
-				padding-left 10px
-
-		.out .message
-			text-align right
-			padding-right 10px
+			&:hover
+				background-color #EBEBEB
 
 	.send
 		position relative
@@ -128,3 +113,30 @@ box-sizing()
 				outline none
 
 				border-radius(0.3125em)
+
+#fancy-messages
+	margin-top 1px
+	height 250px
+	box-shadow 0 0 0 1px black
+	overflow-y auto
+
+	&:last-child
+		margin-bottom 8px
+
+	.in, .out
+		margin 8px 20px 0 20px
+		width auto
+		max-width 300px
+		padding 5px 12px 5px 12px
+		clear both
+		float left
+		position relative
+		word-wrap break-word
+		box-shadow: 0 0 0 1px;
+
+	.in
+		background-color #EBEBEB
+
+	.out
+		background-color #F5F5F5
+		float right

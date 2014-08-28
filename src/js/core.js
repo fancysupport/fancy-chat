@@ -3,9 +3,14 @@ var FancySupport = {
 	node_chat: null,
 	node_listings: null,
 
-	current: null,
-	conversations: [],
-	url: 'http://api.fancysupport.com:4000',
+	user: {},
+	active: null,
+	threads: [],
+	url: 'http://api.fancysupport.com:4000/client',
+
+	id: function(id) {
+		return document.getElementById(id);
+	},
 
 	build_query_string: function(obj) {
 		var s = [];
@@ -20,6 +25,8 @@ var FancySupport = {
 	init: function() {
 		var that = this;
 
+		this.user = FancyUser;
+
 		this.impression();
 
 		this.get_messages();
@@ -29,42 +36,55 @@ var FancySupport = {
 			that.render_widget();
 			that.render_new_chat();
 
-			if (that.current) that.render_existing_chat(that.current);
+			if (that.active) that.render_existing_chat();
 		});
 
-		function encodeHTMLSource() {
+		String.prototype.encodeHTML = function() {
 			var encodeHTMLRules = { "&": "&#38;", "<": "&#60;", ">": "&#62;", '"': '&#34;', "'": '&#39;', "/": '&#47;' },
 			matchHTML = /&(?!#?\w+;)|<|>|"|'|\//g;
 			return function() {
 				return this ? this.replace(matchHTML, function(m) {return encodeHTMLRules[m] || m;}) : this;
 			};
-		}
-		String.prototype.encodeHTML = encodeHTMLSource();
+		}();
 	},
 
 	impression: function() {
-		if ( ! FancyUser)
+		if ( ! this.user)
 			throw "Fancy needs a FancyUser object to run.";
 
-		if ( ! FancyUser.signature)
+		if ( ! this.user.signature)
 			throw "FancyUser needs a customer signature field: signature";
 
-		if ( ! FancyUser.app_key)
+		if ( ! this.user.app_key)
 			throw "FancyUser needs an application key field: app_key.";
 
-		if ( ! FancyUser.customer_id)
+		if ( ! this.user.customer_id)
 			throw "FancyUser needs a customer id field: customer_id.";
 
 		var impression = this.build_query_string({
-			signature: FancyUser.signature,
-			app_key: FancyUser.app_key,
-			customer_id: FancyUser.customer_id,
-			name: FancyUser.name,
-			email: FancyUser.email,
-			phone: FancyUser.phone
+			signature: this.user.signature,
+			app_key: this.user.app_key,
+			customer_id: this.user.customer_id,
+			name: this.user.name,
+			email: this.user.email,
+			phone: this.user.phone
 		});
 
 		this.ajax({method: 'POST', url: '/impression', data: impression});
+	},
+
+	get_messages: function() {
+		var that = this;
+
+		this.ajax({
+			method: 'GET',
+			url: '/messages'
+		}, function(ok, err) {
+			// TODO diff between previous to find new messages and show notification
+			if (ok) {
+				that.threads = ok.data;
+			}
+		});
 	},
 
 	click_send: function() {
@@ -74,39 +94,39 @@ var FancySupport = {
 
 		if (message === '') return;
 
-		var qs = this.build_query_string({
-			app_key: FancyUser.app_key,
-			signature: FancyUser.signature,
-			customer_id: FancyUser.customer_id
-		});
-
 		var data = {
 			content: message,
-			customer_id: FancyUser.customer_id,
+			customer_id: this.user.customer_id
 		};
 
-		if (this.current) { // replying to an existing conversation
+		if (this.active) { // replying to an existing conversation
 			this.ajax({
 				method: 'POST',
-				url: '/messages/' + this.current.id + '/reply?' + qs,
+				url: '/messages/' + this.active.id + '/reply',
 				data: data,
 				json: true
 			}, function(ok, err) {
-				console.log(ok, err);
 				if (ok) {
 					data.incoming = true;
-					that.current.replies.push(data);
-					that.render_existing_chat(that.current);
+					that.active.replies.push(data);
+					that.render_existing_chat();
 				}
 			});
 		} else {  // creating a new conversation
-			this.ajax({method: 'POST', url: '/messages?'+qs, data: data, json: true}, function(ok, err) {
-				console.log(ok, err);
+			// sending initial message requests the customer name
+			data.customer_name = this.user.name;
+
+			this.ajax({
+				method: 'POST',
+				url: '/messages',
+				data: data,
+				json: true
+			}, function(ok, err) {
 				if (ok) {
 					ok.data.replies = [];
-					that.current = ok.data;
-					that.conversations.push(that.current);
-					that.render_existing_chat(that.current);
+					that.active = ok.data;
+					that.threads.push(that.active);
+					that.render_existing_chat();
 				}
 			});
 		}
@@ -116,7 +136,7 @@ var FancySupport = {
 		this.render_listings();
 		this.render_header({title: 'previous chats', which: 'new'});
 
-		this.current = null;
+		this.active = null;
 
 		var that = this;
 
@@ -124,10 +144,10 @@ var FancySupport = {
 			// TODO check for new data?
 
 			var id = this.getAttribute("data-id");
-			that.current = that.conversations[id];
+			that.active = that.threads[id];
 
 			that.render_new_chat();
-			that.render_existing_chat(that.current);
+			that.render_existing_chat();
 		};
 
 		var convos = document.querySelectorAll('.listing');
@@ -139,7 +159,7 @@ var FancySupport = {
 	render_widget: function() {
 		// append the widget to the end of the body, check to make sure
 		// it hasn't already been created, if it has, recreate
-		var div = document.getElementById('fancy-chat');
+		var div = this.id('fancy-chat');
 		if ( ! div) {
 			div = document.createElement('div');
 			div.id = 'fancy-chat';
@@ -149,7 +169,7 @@ var FancySupport = {
 		div.innerHTML = this.templates.widget();
 
 		this.node_chat = document.querySelector('#fancy-chat .chat');
-		this.node_listings = document.getElementById('fancy-listings');
+		this.node_listings = this.id('fancy-listings');
 	},
 
 	render_header: function(data) {
@@ -158,18 +178,15 @@ var FancySupport = {
 
 		div.innerHTML = this.templates.header(data);
 
-		var btnClose = document.getElementById('fancy-close');
-		var btnNewChats = document.getElementById('fancy-newchats');
-
 		var chatsFn = function() { that.click_chats(); };
 		var newFn = function() {
-			that.current = null;
+			that.active = null;
 			that.render_new_chat();
 		};
 
-		btnNewChats.addEventListener('click', data.which == 'new' ? newFn : chatsFn);
+		this.id('fancy-newchats').addEventListener('click', data.which == 'new' ? newFn : chatsFn);
 
-		btnClose.addEventListener('click', function() {
+		this.id('fancy-close').addEventListener('click', function() {
 			that.remove_widget();
 		});
 	},
@@ -182,36 +199,37 @@ var FancySupport = {
 		this.node_chat.innerHTML = this.templates.chat();
 		this.node_listings.innerHTML = '';
 
-		var btnSend = document.getElementById('fancy-send');
-		this.node_message = document.getElementById('fancy-message');
-		this.messages = document.getElementById('fancy-messages');
+		this.node_message = this.id('fancy-message');
+		this.messages = this.id('fancy-messages');
 
-		btnSend.addEventListener('click', function() {
+		this.id('fancy-send').addEventListener('click', function() {
 			that.click_send();
 		});
-	},
-
-	render_listings: function() {
-		this.node_listings.innerHTML = this.templates.listings(this.conversations);
-		this.node_chat.innerHTML = '';
 	},
 
 	render_existing_chat: function(data) {
 		this.render_header({title: 'existing chat', which: 'chats'});
 
-		var div = document.getElementById('fancy-messages');
+		var div = this.id('fancy-messages');
 
-		div.innerHTML = this.templates.messages(data);
+		div.innerHTML = this.templates.messages(this.active);
 		div.scrollTop = div.scrollHeight;
 	}, 
 
+	render_listings: function() {
+		this.node_listings.innerHTML = this.templates.listings(this.threads);
+		this.node_chat.innerHTML = '';
+	},
+
 	remove_widget: function() {
-		document.body.removeChild(document.getElementById('fancy-chat'));
+		document.body.removeChild(this.id('fancy-chat'));
 		this.messages = null;
 		this.node_message = null;
 	},
 
-	ajax: function(opts, cb) {
+	ajax: function (opts, cb) {
+		var that = this;
+
 		var parse = function (req) {
 			var result;
 			try {
@@ -219,94 +237,35 @@ var FancySupport = {
 			} catch (e) {
 				result = req.responseText;
 			}
-			return [result, req];
+			return {code: req.status, data: result};
 		};
-		
-		var xhr = function (type, url, data, json) {
-			var methods = {
-				success: function () {},
-				error: function () {}
-			};
-			var XHR = XMLHttpRequest || ActiveXObject;
-			var request = new XHR('MSXML2.XMLHTTP.3.0');
-			request.open(type, url, true);
 
-			if (json) {
-				request.setRequestHeader('Content-type', 'application/json');
-				data = JSON.stringify(data);
-			} else
-				request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-			
-			request.onreadystatechange = function () {
-				if (request.readyState === 4) {
-					if (request.status >= 200 && request.status < 300) {
-						methods.success.apply(methods, parse(request));
-					} else {
-						methods.error.apply(methods, parse(request));
-					}
+		var XHR = XMLHttpRequest || ActiveXObject;
+		var request = new XHR('MSXML2.XMLHTTP.3.0');
+		request.open(opts.method, that.url+opts.url, true);
+
+		if (opts.json) {
+			request.setRequestHeader('Content-type', 'application/json');
+			opts.data = JSON.stringify(opts.data);
+		} else
+			request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+		request.setRequestHeader('X-App-Key', that.user.app_key);
+		request.setRequestHeader('X-Customer-Id', that.user.customer_id);
+		request.setRequestHeader('X-Signature', that.user.signature);
+
+		request.onreadystatechange = function () {
+			if (request.readyState === 4 && cb) {
+				var obj = parse(request);
+				if (request.status >= 200 && request.status < 300) {
+					cb(obj);
+				} else {
+					cb(null, obj.error || obj);
 				}
-			};
-			request.send(data);
-			var callbacks = {
-				success: function (callback) {
-					methods.success = callback;
-					return callbacks;
-				},
-				error: function (callback) {
-					methods.error = callback;
-					return callbacks;
-				}
-			};
-
-			return callbacks;
-		};
-
-		ajax = {};
-
-		ajax.GET = function (src) {
-			return xhr('GET', src);
-		};
-
-		ajax.PUT = function (url, data, json) {
-			return xhr('PUT', url, data, json);
-		};
-
-		ajax.POST = function (url, data, json) {
-			return xhr('POST', url, data, json);
-		};
-
-		ajax.DELETE = function (url) {
-			return xhr('DELETE', url);
-		};
-
-		var fn = function(data, xhr) {
-			if (cb) cb({code: xhr.status, data: data});
-		};
-
-		ajax[opts.method](this.url+opts.url, opts.data, opts.json)
-			.success(fn)
-			.error(fn);
-	},
-
-	get_messages: function() {
-		var that = this;
-
-		var qs = this.build_query_string({
-			app_key: FancyUser.app_key,
-			signature: FancyUser.signature,
-			customer_id: FancyUser.customer_id
-		});
-
-		this.ajax({
-			method: 'GET',
-			url: '/messages?' + qs
-		}, function(ok, err) {
-			// TODO diff between previous to find new messages and show notification
-			if (ok) {
-				that.conversations = ok.data;
 			}
-		});
-	},
+		};
+		request.send(opts.data);
+	}
 };
 
 FancySupport.init();
