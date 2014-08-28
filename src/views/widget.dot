@@ -3,5 +3,5 @@
 <div class="body">
 	<div class="chat"></div>
 
-	<div class="listings"></div>
+	<div id="fancy-listings"></div>
 </div>

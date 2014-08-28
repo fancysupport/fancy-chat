@@ -4,8 +4,6 @@
 	</div>
 #}}
 
-<div id="fancy-listings">
-	{{~ it :v:k }}
-		{{#def.listing}}
-	{{~}}
-</div>
+{{~ it :v:k }}
+	{{#def.listing}}
+{{~}}

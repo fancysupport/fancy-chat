@@ -28,6 +28,8 @@ var FancySupport = {
 		.addEventListener('click', function() {
 			that.render_widget();
 			that.render_new_chat();
+
+			if (that.current) that.render_existing_chat(that.current);
 		});
 
 		function encodeHTMLSource() {
@@ -147,7 +149,7 @@ var FancySupport = {
 		div.innerHTML = this.templates.widget();
 
 		this.node_chat = document.querySelector('#fancy-chat .chat');
-		this.node_listings = document.querySelector('#fancy-chat .listings');
+		this.node_listings = document.getElementById('fancy-listings');
 	},
 
 	render_header: function(data) {
@@ -207,7 +209,6 @@ var FancySupport = {
 		document.body.removeChild(document.getElementById('fancy-chat'));
 		this.messages = null;
 		this.node_message = null;
-		this.current = null;
 	},
 
 	ajax: function(opts, cb) {
