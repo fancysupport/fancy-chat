@@ -26,8 +26,8 @@ var FancySupport = {
 
 		document.querySelector(FancyUser.activator)
 		.addEventListener('click', function() {
-			that.renderWidget();
-			that.renderChat();
+			that.render_widget();
+			that.render_new_chat();
 		});
 
 		function encodeHTMLSource() {
@@ -51,7 +51,7 @@ var FancySupport = {
 			throw "FancyUser needs an application key field: app_key.";
 
 		if ( ! FancyUser.customer_id)
-			throw "FancyUser needs a customer id field: customer_id."
+			throw "FancyUser needs a customer id field: customer_id.";
 
 		var impression = this.build_query_string({
 			signature: FancyUser.signature,
@@ -65,7 +65,7 @@ var FancySupport = {
 		this.ajax({method: 'POST', url: '/impression', data: impression});
 	},
 
-	onSendClick: function() {
+	click_send: function() {
 		var that = this;
 		var message = this.node_message.value;
 		this.node_message.value = '';
@@ -94,7 +94,7 @@ var FancySupport = {
 				if (ok) {
 					data.incoming = true;
 					that.current.replies.push(data);
-					that.renderMessages(that.current);
+					that.render_existing_chat(that.current);
 				}
 			});
 		} else {  // creating a new conversation
@@ -104,15 +104,15 @@ var FancySupport = {
 					ok.data.replies = [];
 					that.current = ok.data;
 					that.conversations.push(that.current);
-					that.renderMessages(that.current);
+					that.render_existing_chat(that.current);
 				}
 			});
 		}
 	},
 
-	onChatsClick: function() {
-		this.renderListings();
-		this.renderHeader({title: 'previous chats', which: 'new'});
+	click_chats: function() {
+		this.render_listings();
+		this.render_header({title: 'previous chats', which: 'new'});
 
 		this.current = null;
 
@@ -124,8 +124,8 @@ var FancySupport = {
 			var id = this.getAttribute("data-id");
 			that.current = that.conversations[id];
 
-			that.renderChat();
-			that.renderMessages(that.current);
+			that.render_new_chat();
+			that.render_existing_chat(that.current);
 		};
 
 		var convos = document.querySelectorAll('.listing');
@@ -134,7 +134,7 @@ var FancySupport = {
 		}
 	},
 
-	renderWidget: function() {
+	render_widget: function() {
 		// append the widget to the end of the body, check to make sure
 		// it hasn't already been created, if it has, recreate
 		var div = document.getElementById('fancy-chat');
@@ -150,7 +150,7 @@ var FancySupport = {
 		this.node_listings = document.querySelector('#fancy-chat .listings');
 	},
 
-	renderHeader: function(data) {
+	render_header: function(data) {
 		var that = this;
 		var div = document.querySelector('#fancy-chat .header');
 
@@ -159,23 +159,23 @@ var FancySupport = {
 		var btnClose = document.getElementById('fancy-close');
 		var btnNewChats = document.getElementById('fancy-newchats');
 
-		var chatsFn = function() { that.onChatsClick(); };
+		var chatsFn = function() { that.click_chats(); };
 		var newFn = function() {
 			that.current = null;
-			that.renderChat();
+			that.render_new_chat();
 		};
 
 		btnNewChats.addEventListener('click', data.which == 'new' ? newFn : chatsFn);
 
 		btnClose.addEventListener('click', function() {
-			that.removeWidget();
+			that.remove_widget();
 		});
 	},
 
-	renderChat: function() {
+	render_new_chat: function() {
 		var that = this;
 
-		this.renderHeader({title: 'new chat', which: 'chats'});
+		this.render_header({title: 'new chat', which: 'chats'});
 
 		this.node_chat.innerHTML = this.templates.chat();
 		this.node_listings.innerHTML = '';
@@ -185,17 +185,17 @@ var FancySupport = {
 		this.messages = document.getElementById('fancy-messages');
 
 		btnSend.addEventListener('click', function() {
-			that.onSendClick();
+			that.click_send();
 		});
 	},
 
-	renderListings: function() {
+	render_listings: function() {
 		this.node_listings.innerHTML = this.templates.listings(this.conversations);
 		this.node_chat.innerHTML = '';
 	},
 
-	renderMessages: function(data) {
-		this.renderHeader({title: 'existing chat', which: 'chats'});
+	render_existing_chat: function(data) {
+		this.render_header({title: 'existing chat', which: 'chats'});
 
 		var div = document.getElementById('fancy-messages');
 
@@ -203,7 +203,7 @@ var FancySupport = {
 		div.scrollTop = div.scrollHeight;
 	}, 
 
-	removeWidget: function() {
+	remove_widget: function() {
 		document.body.removeChild(document.getElementById('fancy-chat'));
 		this.messages = null;
 		this.node_message = null;
