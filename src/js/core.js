@@ -1,5 +1,5 @@
 var FancySupport = {
-	node_message: null,
+	node_textarea: null,
 	node_chat: null,
 	node_listings: null,
 
@@ -89,8 +89,8 @@ var FancySupport = {
 
 	click_send: function() {
 		var that = this;
-		var message = this.node_message.value;
-		this.node_message.value = '';
+		var message = this.node_textarea.value;
+		this.node_textarea.value = '';
 
 		if (message === '') return;
 
@@ -174,15 +174,12 @@ var FancySupport = {
 
 	render_header: function(data) {
 		var that = this;
-		var div = document.querySelector('#fancy-chat .header');
+		var div = this.id('fancy-header');
 
 		div.innerHTML = this.templates.header(data);
 
 		var chatsFn = function() { that.click_chats(); };
-		var newFn = function() {
-			that.active = null;
-			that.render_new_chat();
-		};
+		var newFn = function() { that.render_new_chat(); };
 
 		this.id('fancy-newchats').addEventListener('click', data.which == 'new' ? newFn : chatsFn);
 
@@ -199,7 +196,7 @@ var FancySupport = {
 		this.node_chat.innerHTML = this.templates.chat();
 		this.node_listings.innerHTML = '';
 
-		this.node_message = this.id('fancy-message');
+		this.node_textarea = this.id('fancy-textarea');
 		this.messages = this.id('fancy-messages');
 
 		this.id('fancy-send').addEventListener('click', function() {
@@ -224,7 +221,7 @@ var FancySupport = {
 	remove_widget: function() {
 		document.body.removeChild(this.id('fancy-chat'));
 		this.messages = null;
-		this.node_message = null;
+		this.node_textarea = null;
 	},
 
 	ajax: function (opts, cb) {

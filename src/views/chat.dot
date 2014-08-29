@@ -4,7 +4,7 @@
 
 <div class="send">
 	<div class="message">
-		<textarea id="fancy-message" placeholder="batman"></textarea>
+		<textarea id="fancy-textarea" placeholder="batman"></textarea>
 	</div>
 
 	<div id="fancy-send">Send</div>
