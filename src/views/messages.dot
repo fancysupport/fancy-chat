@@ -1,22 +1,13 @@
 {{##def.message:param:
-	<p class="message">{{! param.content }}</p>
+	<div class="{{? param.incoming === true }}in{{??}}out{{?}} fancy-cf">
+		<div class="time">{{= FancySupport.timeago(param.created) }}</div>
+		<div class="message">{{! param.content }}</div>
+	</div>
 #}}
 
-{{##def.container:param:
-	<div class="{{? param.incoming === true }}in{{??}}out{{?}}">
-		{{#def.message:param}}
-#}}
 
-{{ var prev = it.incoming; }}
-	{{#def.container:it}}
+{{#def.message:it}}
 
 {{~ it.replies :m }}
-	{{? m.incoming === prev }}
-		{{#def.message:m}}
-	{{??}}
-		</div>{{#def.container:m}}
-	{{?}}
-	{{ prev = m.incoming; }}
-
+	{{#def.message:m}}
 {{~}}
-</div>

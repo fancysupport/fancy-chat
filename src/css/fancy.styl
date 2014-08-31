@@ -129,23 +129,46 @@ icon_new = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAWCAYAAAChWZ5EAA
 	box-shadow 0 0 0 1px black
 	overflow-y auto
 
-	.in:last-child, .out:last-child
-		margin-bottom 10px
-
 	.in, .out
-		margin 8px 20px 0 20px
-		width auto
-		max-width 300px
-		padding 5px 12px 5px 12px
-		clear both
-		float left
-		position relative
-		word-wrap break-word
-		box-shadow: 0 0 0 1px;
+		margin 0 20px
 
-	.in
-		background-color #EBEBEB
+		&:last-child
+			margin-bottom 10px
+
+		&:first-child
+			margin-top -10px
+
+		.message
+			width auto
+			max-width 300px
+			padding 5px 12px 5px 12px
+			clear both
+			float left
+			position relative
+			word-wrap break-word
+			border black solid 1px
+			background-color #EBEBEB
+
+		.time
+			position relative
+			clear both
+			float right
+			top 22px
+			font-size 12px
+			color grey
 
 	.out
-		background-color #F5F5F5
-		float right
+		.message
+			background-color #F5F5F5
+			float right
+
+		.time
+			float left
+
+.fancy-cf:before,
+.fancy-cf:after
+	content " "
+	display table
+
+.fancy-cf:after
+	clear both

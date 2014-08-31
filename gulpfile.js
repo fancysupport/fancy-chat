@@ -2,7 +2,6 @@ var gulp = require('gulp');
 var gutil = require('gulp-util');
 var concat = require('gulp-concat');
 var header = require('gulp-header');
-var clean = require('gulp-clean');
 var dot = require('gulp-dot-precompiler');
 var run = require('run-sequence');
 var uglify = require('gulp-uglify');
@@ -42,8 +41,15 @@ gulp.task('dot', function() {
 		varname: 'it'
 	};
 
+	var d = dot(options)
+		.on('error', function(e) {
+			handle_error(e);
+			d.end();
+			return false;
+		});
+
 	return gulp.src(paths.dot)
-		.pipe(dot(options))
+		.pipe(d)
 		.pipe(concat('templates.js'))
 		.pipe(header('FancySupport.templates = {};\n'))
 		.pipe(gulp.dest('src/js'));
@@ -71,22 +77,6 @@ gulp.task('combine', function() {
 		.pipe(concat('client.js'))
 		.pipe(uglify())
 		.pipe(gulp.dest(paths.dist));
-});
-
-gulp.task('clean', function() {
-	return gulp.src(paths.dist)
-		.pipe(clean());
-});
-
-gulp.task('transitionals', function() {
-	var files = [
-		'src/css/fancycss.css',
-		'src/js/fancycss.js',
-		'src/js/templates.js'
-	];
-
-	return gulp.src(files)
-		.pipe(clean());
 });
 
 gulp.task('build', function() {
