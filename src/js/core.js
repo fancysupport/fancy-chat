@@ -186,16 +186,6 @@ var FancySupport = {
 		this.id('fancy-close').addEventListener('click', function() {
 			that.remove_widget();
 		});
-
-		var star = this.id('fancy-star');
-
-		if (star) this.id('fancy-star').addEventListener('click', function() {
-			that.active.starred = !that.active.starred;
-
-			// FIXME remember to fix this if the title changes ever
-			// TODO actually update on server too
-			that.render_header({title: 'existing chat', which: 'chats', starred: that.active.starred});
-		});
 	},
 
 	render_new_chat: function() {
@@ -215,7 +205,7 @@ var FancySupport = {
 	},
 
 	render_existing_chat: function(data) {
-		this.render_header({title: 'existing chat', which: 'chats', starred: this.active.starred});
+		this.render_header({title: 'existing chat', which: 'chats'});
 
 		var div = this.id('fancy-messages');
 

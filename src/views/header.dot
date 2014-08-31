@@ -1,7 +1,4 @@
 <span>{{= it.title }}</span>
 
-{{? it.starred !== undefined }}
-	<a id="fancy-star" class="starred {{=it.starred }}"></a>
-{{?}}
 <a id="fancy-newchats" class="{{= it.which }}"></a>
 <a id="fancy-close"></a>
