@@ -28,8 +28,11 @@ var FancySupport = {
 		this.user = FancyUser;
 
 		this.impression();
-
 		this.get_messages();
+
+		setInterval(function() {
+			that.get_messages();
+		}, 10*60*1000);
 
 		document.querySelector(FancyUser.activator)
 		.addEventListener('click', function() {
@@ -141,8 +144,6 @@ var FancySupport = {
 		var that = this;
 
 		var fn = function() {
-			// TODO check for new data?
-
 			var id = this.getAttribute("data-id");
 			that.active = that.threads[id];
 

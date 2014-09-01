@@ -1,6 +1,8 @@
 {{##def.listing:
 	<div class="listing" data-id="{{= k }}">
-		{{! v.content }}
+		<div class="title">Fancy Name</div>
+		<div class="content">{{! v.content }}</div>
+		<div class="time">{{= FancySupport.timeago(v.updated) }}</div>
 	</div>
 #}}
 
