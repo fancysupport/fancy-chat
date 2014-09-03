@@ -56,7 +56,7 @@ gulp.task('dot', function() {
 });
 
 gulp.task('css', function() {
-	var s = stylus({errors: true, compress: true, 'include css': true})
+	var s = stylus({errors: true, compress: false, 'include css': true})
 		.on('error', function(e) {
 			handle_error(e);
 			s.end();
@@ -67,7 +67,7 @@ gulp.task('css', function() {
 		.pipe(s)
 		.pipe(concat('fancycss.css'))
 		.pipe(css2js({
-			splitOnNewLine: false
+			splitOnNewLine: true
 		}))
 		.pipe(gulp.dest('src/js/'));
 });
@@ -75,18 +75,24 @@ gulp.task('css', function() {
 gulp.task('combine', function() {
 	return gulp.src(paths.scripts)
 		.pipe(concat('client.js'))
+		.pipe(gulp.dest(paths.dist));
+});
+
+gulp.task('minify', ['combine'], function() {
+	return gulp.src('build/client.js')
 		.pipe(uglify())
+		.pipe(concat('clinet.min.js'))
 		.pipe(gulp.dest(paths.dist));
 });
 
 gulp.task('build', function() {
-	run('dot', 'css', 'combine', 'watch');
+	run('dot', 'css', 'minify', 'watch');
 });
 
 gulp.task('watch', function() {
 	livereload.listen();
 
-	gulp.watch(paths.scripts, ['combine']);
+	gulp.watch(paths.scripts, ['combine', 'minify']);
 	gulp.watch(paths.dot, ['dot']);
 	gulp.watch(paths.css, ['css']);
 
