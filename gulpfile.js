@@ -81,7 +81,7 @@ gulp.task('combine', function() {
 gulp.task('minify', ['combine'], function() {
 	return gulp.src('build/client.js')
 		.pipe(uglify())
-		.pipe(concat('clinet.min.js'))
+		.pipe(concat('client.min.js'))
 		.pipe(gulp.dest(paths.dist));
 });
 
