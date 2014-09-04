@@ -22,10 +22,10 @@ var FancySupport = {
 		return s.join("&");
 	},
 
-	init: function() {
+	init: function(options) {
 		var that = this;
 
-		this.user = FancyUser;
+		this.user = options;
 
 		this.impression();
 		this.get_messages();
@@ -34,7 +34,7 @@ var FancySupport = {
 			that.get_messages();
 		}, 10*60*1000);
 
-		document.querySelector(FancyUser.activator)
+		document.querySelector(options.activator)
 		.addEventListener('click', function() {
 			that.render_widget();
 			that.render_new_chat();
@@ -53,16 +53,16 @@ var FancySupport = {
 
 	impression: function() {
 		if ( ! this.user)
-			throw "Fancy needs a FancyUser object to run.";
+			throw "Fancy needs a user object to run.";
 
 		if ( ! this.user.signature)
-			throw "FancyUser needs a customer signature field: signature";
+			throw "Fancy needs a customer signature field: signature";
 
 		if ( ! this.user.app_key)
-			throw "FancyUser needs an application key field: app_key.";
+			throw "Fancy needs an application key field: app_key.";
 
 		if ( ! this.user.customer_id)
-			throw "FancyUser needs a customer id field: customer_id.";
+			throw "Fancy needs a customer id field: customer_id.";
 
 		var impression = this.build_query_string({
 			signature: this.user.signature,
@@ -293,5 +293,3 @@ var FancySupport = {
 			return (time <= local)  ? span + ' ago' : 'in ' + span;
 	}
 };
-
-FancySupport.init();
