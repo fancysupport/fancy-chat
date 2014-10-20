@@ -76,7 +76,40 @@ var FancySupport = {
 		this.ajax({method: 'POST', url: '/impression', data: impression});
 	},
 
-	get_messages: function() {
+	info_event: function(name, desc) {
+		this.event(name, desc, 'info');
+	},
+
+	warning_event: function(name, desc) {
+		this.event(name, desc, 'warning');
+	},
+
+	error_event: function(name, desc) {
+		this.event(name, desc, 'critical');
+	},
+
+	event: function(name, desc, level) {
+		if ( ! name) return; // no event, so go home
+
+		level = level || 'info';
+
+		// set them all to strings since numbers produce errors
+		var event = {
+			customer_id: this.user.customer_id,
+			name: ''+name,
+			description: ''+desc,
+			level: ''+level
+		};
+
+		this.ajax({
+			method: 'POST',
+			url: '/events',
+			data: event,
+			json: true
+		});
+	},
+
+	get_messages: function(name, desc) {
 		var that = this;
 
 		this.ajax({
