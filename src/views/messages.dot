@@ -1,10 +1,15 @@
 {{##def.message:param:
-	<div class="{{? param.incoming === true }}in{{??}}out{{?}} fancy-cf">
-		<div class="time">{{= FancySupport.timeago(param.created) }}</div>
-		<div class="message">{{! param.content }}</div>
+	<div class="{{? param.incoming === true }}in{{??}}out{{?}} message">
+		<div class="info">
+			<img class="avatar" src="http://dummyimage.com/50/000/fff" />
+			<div class="time">{{= FancySupport.timeago(param.created) }}</div>
+		</div>
+		<div class="text">
+			<div class="name">{{= FancySupport.users[param.user_id]}}</div>
+			{{! param.content }}
+		</div>
 	</div>
 #}}
-
 
 {{#def.message:it}}
 

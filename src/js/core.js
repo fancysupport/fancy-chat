@@ -4,6 +4,7 @@ var FancySupport = {
 	node_listings: null,
 
 	user: {},
+	users: {}, // id/name map for customer and staff
 	active: null,
 	threads: [],
 	url: 'http://api.fancysupport.com:4000/client',
@@ -29,6 +30,8 @@ var FancySupport = {
 
 		this.impression();
 		this.get_messages();
+
+		this.users[''] = this.user.name;
 
 		setInterval(function() {
 			that.get_messages();
