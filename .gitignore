@@ -6,7 +6,10 @@ sftp-config.json
 *.sublime-*
 node_modules/
 
-build/client.*
+build/*
+
+dist/client.js
+dist/client.min.js
 
 src/js/fancycss.js
 src/js/templates.js
