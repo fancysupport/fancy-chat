@@ -120,26 +120,33 @@ icon_new = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAWCAYAAAChWZ5EAA
 			background-image url(icon_close)
 
 #fancy-listings
-	height 369px
-	margin-top 1px
+	height 85%
 	overflow-y auto
 
 	.listing
 		cursor pointer
-		padding 8px
+		padding 10px 20px
 		position relative
 
+		.avatar
+			position absolute
+			bottom 5px
+
+		.text
+			margin-left 60px
+			margin-top 5px
+
 		&:hover
-			background-color #EBEBEB
+			background-color #D3D3D3
 
 		.title
 			font-weight bold
 
 		.time
 			position absolute
-			right 9px
+			right 20px
 			top 9px
-			color grey
+			color #808080
 			font-size 12px
 
 		.content

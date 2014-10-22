@@ -1,8 +1,11 @@
 {{##def.listing:
 	<div class="listing" data-id="{{= k }}">
-		<div class="title">Fancy Name</div>
-		<div class="content">{{! v.content }}</div>
-		<div class="time">{{= FancySupport.timeago(v.updated) }}</div>
+		<img class="avatar" src="http://dummyimage.com/50/000/fff" />
+		<div class="text">
+			<div class="title">Fancy Name</div>
+			<div class="content">{{! v.content }}</div>
+			<div class="time">{{= FancySupport.timeago(v.updated) }}</div>
+		</div>
 	</div>
 #}}
 
