@@ -5,7 +5,7 @@
 			<div class="time">{{= FancySupport.timeago(param.created) }}</div>
 		</div>
 		<div class="text">
-			<div class="name">2{{= FancySupport.users[param.user_id]}}</div>
+			<div class="name">{{= FancySupport.users[param.user_id]}}</div>
 			{{! param.content }}
 		</div>
 	</div>

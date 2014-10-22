@@ -55,7 +55,7 @@ gulp.task('css', function() {
 			return false;
 		});
 
-	return gulp.src('src/css/**/*')
+	return gulp.src('src/css/base.styl')
 		.pipe(s)
 		.pipe(concat('fancycss.css'))
 		.pipe(css2js({
@@ -69,7 +69,7 @@ gulp.task('js', function() {
 		.pipe(gulp.dest('build'));
 });
 
-gulp.task('combine', function() {
+gulp.task('combine', ['js', 'dot', 'css'], function() {
 	return gulp.src('build/*.js')
 		.pipe(concat('client.js'))
 		.pipe(gulp.dest('dist'));
@@ -85,11 +85,7 @@ gulp.task('minify', ['combine'], function() {
 gulp.task('watch', function() {
 	livereload.listen();
 
-	gulp.watch('build/*', ['minify']);
-
-	gulp.watch('src/js/**/*', ['js']);
-	gulp.watch('src/views/**/*', ['dot']);
-	gulp.watch('src/css/**/*', ['css']);
+	gulp.watch(['src/js/**/*','src/views/**/*','src/css/**/*'], ['combine']);
 
 	gulp.watch('dist/client.js').on('change', function(f) {
 		livereload().changed(f.path);
