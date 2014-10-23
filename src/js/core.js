@@ -173,7 +173,7 @@ var FancySupport = {
 
 	click_chats: function() {
 		this.render_listings();
-		this.render_header({title: 'previous chats', which: 'new'});
+		this.render_header({title: 'previous chats', which: 'fancy-icon-pencil'});
 
 		this.active = null;
 
@@ -218,7 +218,7 @@ var FancySupport = {
 		var chatsFn = function() { that.click_chats(); };
 		var newFn = function() { that.render_new_chat(); };
 
-		this.id('fancy-newchats').addEventListener('click', data.which == 'new' ? newFn : chatsFn);
+		this.id('fancy-newchats').addEventListener('click', data.which == 'fancy-icon-pencil' ? newFn : chatsFn);
 
 		this.id('fancy-close').addEventListener('click', function() {
 			that.remove_widget();
@@ -228,7 +228,7 @@ var FancySupport = {
 	render_new_chat: function() {
 		var that = this;
 
-		this.render_header({title: 'new chat', which: 'chats'});
+		this.render_header({title: 'new chat', which: 'fancy-icon-list'});
 
 		this.node_chat.innerHTML = this.templates.chat();
 		this.node_listings.innerHTML = '';
@@ -242,7 +242,7 @@ var FancySupport = {
 	},
 
 	render_existing_chat: function(data) {
-		this.render_header({title: 'existing chat', which: 'chats'});
+		this.render_header({title: 'existing chat', which: 'fancy-icon-list'});
 
 		var div = this.id('fancy-messages');
 

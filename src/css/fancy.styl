@@ -12,9 +12,44 @@ user-select()
 box-sizing()
 	vendor(box-sizing, arguments)
 
-icon_close = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAWCAYAAAChWZ5EAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAACDQAAAg0Bd06+cAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAACqSURBVEjH7ZaxDYUwDESfEAVUhDmYmIIp6EAMAGIn0xgpRYL4X0amoLjqTr5THDtBRPAEX4CfxNAB5QVfAp15AKAABkCAHWgTmlY5UW1hGaDXwhKFCBEfIvMTvUkALS4JbECj2DKaYHUCY8ZgVaS40bIFFTBljFKYgMp0CjTEfMN8vmv+zxjWwHJhvgD1k3vAL4BrC9wvoesYvmUR+a3iVzxG7s/x9yN6EgcewZkbjd7+uwAAAABJRU5ErkJggg2760b29e907bb3f6679d7bb19909e1e8'
-icon_chats = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAWCAYAAAChWZ5EAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAACDQAAAg0Bd06+cAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAABwSURBVEjHY/j//z/DQGKGUQfglGBgkAbiU0B8g0IMMkOaHAd4APF/KmEPchxgSUUHWJKVBoDAChoSlGCr0VxAbi7gBOImIJ5AIQaZwUmOA1ypmAhdh6QDBjYKRnPBgBdEA14UD4bKaGCr49FcQC8MAFuxIjMFJeMNAAAAAElFTkSuQmCC75e4622e540be52b8136420cf8cc5769'
-icon_new = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAWCAYAAAChWZ5EAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAACDQAAAg0Bd06+cAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAF0SURBVEjH3da/S1dhFMfxV6bWUNIkOJv/gYOQuIQQDSINCYItIiHi4CqEjq0tgYKBBCpIBNLmIjjopm0ugigNIkSIKP7qOni+cBG0+yN/4HCGe8899/N+Ds/5PI8kSdxmuLMAqEIPxjGTIabwAQ1R/wh9aM4NgGrMI8ER/mSMX2hEDX5E/SE68gIMRvFHPMvV0nPxOozFPyoQ7XkA5rCD2pzi1fiOpYCYSEF8ywOwjOUC4rNYxQYW8RSTRTqQCwAPMY0VDOE0Vr2AJ1dtxNIAMS1fY+WDKfHKBm4rMgWZAPAAX/AT/ThJiR/jTSEfyAIQ4uNYi3k/Tomf4G1hI8oI8DnEfkerK+Kn6C7lhP8CwCds4zW2Loi/K23FVwHgcYi9iOemgPmL3njXg/rrBlhHK15hH+8j3xr5lusGSMLxDjCQynf+D4BLrTgcbzQVXRfywwHwvAxAocMIbdiMqCoDUOQ43o3v9/Dyti4kI2i8H1eym4ozFy4wWbepAoYAAAAASUVORK5CYII4cc6e9061ed51a469ea2e595be7607cc'
+@font-face {
+	font-family: 'fancy';
+	src:url('http://cdn.fancy.support/fonts/fancy.eot?wypba3');
+	src:url('http://cdn.fancy.support/fonts/fancy.eot?#iefixwypba3') format('embedded-opentype'),
+		url('http://cdn.fancy.support/fonts/fancy.woff?wypba3') format('woff'),
+		url('http://cdn.fancy.support/fonts/fancy.ttf?wypba3') format('truetype'),
+		url('http://cdn.fancy.support/fonts/fancy.svg?wypba3#fancy') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+
+[class^="fancy-icon-"], [class*=" fancy-icon-"] {
+	font-family: 'fancy';
+	speak: none;
+	font-style: normal;
+	font-weight: normal;
+	font-variant: normal;
+	text-transform: none;
+	line-height: 1;
+
+	font-size 22px
+
+	/* Better Font Rendering =========== */
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+.fancy-icon-pencil:before {
+	content: "\e600";
+	font-size 20px
+}
+.fancy-icon-cross:before {
+	content: "\e601";
+}
+.fancy-icon-list:before {
+	content: "\e602";
+}
+
 
 #fancy-chat
 	position fixed
@@ -93,12 +128,10 @@ icon_new = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAWCAYAAAChWZ5EAA
 	border-top-right-radius 4px
 
 	span
-		position absolute
-		width 80%
+		position relative
 		top 25px
-		left 10%
+		left 5%
 		font-size 18pt
-		text-align center
 
 	a
 		position absolute
@@ -107,17 +140,9 @@ icon_new = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAWCAYAAAChWZ5EAA
 		width 32px
 		height 22px
 		cursor pointer
-		background-repeat no-repeat
-
-		&.chats
-			background-image url(icon_chats)
-
-		&.new
-			background-image url(icon_new)
 
 		&:last-child
 			right 5px
-			background-image url(icon_close)
 
 #fancy-listings
 	height 85%
@@ -171,6 +196,7 @@ icon_new = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAWCAYAAAChWZ5EAA
 		padding 10px 15px
 		background-color #fff
 		word-wrap break-word
+		box-shadow 0 1px 0 0 rgba(0, 0, 0, 0.1)
 
 		&:after
 			content ' '
@@ -207,7 +233,7 @@ icon_new = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAWCAYAAAChWZ5EAA
 			margin-left 70px
 
 			&:after
-				left -16px
+				left -17px
 				border-color transparent #fff transparent transparent
 
 		.info
@@ -220,7 +246,7 @@ icon_new = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAWCAYAAAChWZ5EAA
 			margin-right 70px
 
 			&:after
-				right -15px
+				right -17px
 				border-color transparent transparent transparent #fff
 
 		.info
