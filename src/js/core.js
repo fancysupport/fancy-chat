@@ -41,6 +41,7 @@ var FancySupport = {
 		.addEventListener('click', function() {
 			that.render_widget();
 			that.render_new_chat();
+			that.get_messages();
 
 			if (that.active) that.render_existing_chat();
 		});
@@ -112,7 +113,7 @@ var FancySupport = {
 		});
 	},
 
-	get_messages: function(name, desc) {
+	get_messages: function(cb) {
 		var that = this;
 
 		this.ajax({
@@ -122,6 +123,7 @@ var FancySupport = {
 			// TODO diff between previous to find new messages and show notification
 			if (ok) {
 				that.threads = ok.data;
+				if (cb) cb();
 			}
 		});
 	},
@@ -171,13 +173,12 @@ var FancySupport = {
 		}
 	},
 
-	click_chats: function() {
+	click_chats_update: function() {
+		var that = this;
 		this.render_listings();
 		this.render_header({title: 'Past Messages', which: 'fancy-icon-pencil'});
 
 		this.active = null;
-
-		var that = this;
 
 		var fn = function() {
 			var id = this.getAttribute("data-id");
@@ -191,6 +192,18 @@ var FancySupport = {
 		for (var i=0; i<convos.length; i++) {
 			convos[i].addEventListener('click', fn);
 		}
+	},
+
+	click_chats: function() {
+		var that = this;
+
+		// show what we have so its quick
+		this.click_chats_update();
+
+		// get new stuff too so it right
+		this.get_messages(function() {
+			that.click_chats_update();
+		});
 	},
 
 	render_widget: function() {
