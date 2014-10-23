@@ -41,9 +41,26 @@ var FancySupport = {
 		.addEventListener('click', function() {
 			that.render_widget();
 			that.render_new_chat();
-			that.get_messages();
 
-			if (that.active) that.render_existing_chat();
+			if (that.active) {
+				// get something out quick
+				that.render_existing_chat();
+
+				// get the most recent version of active
+				that.get_messages(function() {
+					// reassign the active conversation
+					for (var i=0; i<that.threads.length; i++) {
+						if (that.active.id === that.threads[i].id) {
+							that.active = that.threads[i];
+						}
+					}
+
+					that.render_existing_chat();
+				});
+			} else {
+				// get new versions on open
+				that.get_messages();
+			}
 		});
 
 		String.prototype.encodeHTML = function() {
