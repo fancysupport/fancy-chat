@@ -47,14 +47,7 @@ var FancySupport = {
 				that.render_existing_chat();
 
 				// get the most recent version of active
-				that.get_messages(function() {
-					// reassign the active conversation
-					for (var i=0; i<that.threads.length; i++) {
-						if (that.active.id === that.threads[i].id) {
-							that.active = that.threads[i];
-						}
-					}
-
+				that.update_active(function() {
 					that.render_existing_chat();
 				});
 			} else {
@@ -145,6 +138,22 @@ var FancySupport = {
 		});
 	},
 
+	update_active: function(cb) {
+		var that = this;
+
+		this.get_messages(function() {
+			if ( ! that.active) return;
+			// reassign the active conversation
+			for (var i=0; i<that.threads.length; i++) {
+				if (that.active.id === that.threads[i].id) {
+					that.active = that.threads[i];
+				}
+			}
+
+			if (cb) cb();
+		});
+	},
+
 	click_send: function() {
 		var that = this;
 		var message = this.node_textarea.value;
@@ -165,9 +174,17 @@ var FancySupport = {
 				json: true
 			}, function(ok, err) {
 				if (ok) {
+					// set some things on the data object so ui updates right
 					data.incoming = true;
+					data.created = Math.floor(new Date().getTime()/1000);
+					data.user_id = '';
 					that.active.replies.push(data);
+
 					that.render_existing_chat();
+
+					that.update_active(function() {
+						that.render_existing_chat();
+					});
 				}
 			});
 		} else {  // creating a new conversation
@@ -333,7 +350,7 @@ var FancySupport = {
 
 	timeago: function(time) {
 		var
-				local = new Date().getTime()/1000,
+				local  = Math.floor(new Date().getTime()/1000),
 				offset = Math.abs((local - time)),
 				span   = [],
 				MINUTE = 60,
