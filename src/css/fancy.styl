@@ -32,7 +32,7 @@ box-sizing()
 	text-transform: none;
 	line-height: 1;
 
-	font-size 22px
+	font-size 32px
 
 	/* Better Font Rendering =========== */
 	-webkit-font-smoothing: antialiased;
@@ -41,7 +41,6 @@ box-sizing()
 
 .fancy-icon-pencil:before {
 	content: "\e600";
-	font-size 20px
 }
 .fancy-icon-cross:before {
 	content: "\e601";
@@ -97,6 +96,7 @@ box-sizing()
 	vertical-align top
 
 	outline none
+	border none
 
 	border-radius(0.3125em)
 
@@ -135,14 +135,16 @@ box-sizing()
 
 	a
 		position absolute
-		right 32px
-		top 31px
-		width 32px
-		height 22px
+		right 40px
+		top 26px
 		cursor pointer
 
 		&:last-child
-			right 5px
+			right 8px
+
+	.fancy-icon-pencil
+		top 30px
+		font-size 24px
 
 #fancy-listings
 	height 85%

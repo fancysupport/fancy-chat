@@ -173,7 +173,7 @@ var FancySupport = {
 
 	click_chats: function() {
 		this.render_listings();
-		this.render_header({title: 'previous chats', which: 'fancy-icon-pencil'});
+		this.render_header({title: 'Past Messages', which: 'fancy-icon-pencil'});
 
 		this.active = null;
 
@@ -228,7 +228,7 @@ var FancySupport = {
 	render_new_chat: function() {
 		var that = this;
 
-		this.render_header({title: 'new chat', which: 'fancy-icon-list'});
+		this.render_header({title: 'New Message', which: 'fancy-icon-list'});
 
 		this.node_chat.innerHTML = this.templates.chat();
 		this.node_listings.innerHTML = '';
@@ -242,7 +242,7 @@ var FancySupport = {
 	},
 
 	render_existing_chat: function(data) {
-		this.render_header({title: 'existing chat', which: 'fancy-icon-list'});
+		this.render_header({title: 'Existing Message', which: 'fancy-icon-list'});
 
 		var div = this.id('fancy-messages');
 
@@ -316,7 +316,7 @@ var FancySupport = {
 
 			if (offset <= MINUTE)              span = [ '', 'moments' ];
 			else if (offset < (MINUTE * 60))   span = [ Math.round(Math.abs(offset / MINUTE)), 'min' ];
-			else if (offset < (HOUR * 24))     span = [ Math.round(Math.abs(offset / HOUR)), 'hr' ];
+			else if (offset < (HOUR * 24))     span = [ Math.round(Math.abs(offset / HOUR)), 'hour' ];
 			else if (offset < (DAY * 7))       span = [ Math.round(Math.abs(offset / DAY)), 'day' ];
 			else if (offset < (WEEK * 52))     span = [ Math.round(Math.abs(offset / WEEK)), 'week' ];
 			else if (offset < (YEAR * 10))     span = [ Math.round(Math.abs(offset / YEAR)), 'year' ];
