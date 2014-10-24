@@ -197,7 +197,10 @@ var FancySupport = {
 			for (var j=0; j<thread.replies.length; j++) {
 				var reply = thread.replies[j];
 
-				if (reply.created > last_read) updates++;
+				if (reply.created > last_read) {
+					updates++;
+					thread.unread = true;
+				}
 			}
 		}
 

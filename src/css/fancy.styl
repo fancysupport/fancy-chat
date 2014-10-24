@@ -162,9 +162,12 @@ box-sizing()
 		padding 10px 20px
 		position relative
 
+		&.unread
+			color #C0392B
+
 		.avatar
 			position absolute
-			bottom 5px
+			top 16px
 			width 50px
 			height 50px
 
@@ -189,6 +192,9 @@ box-sizing()
 			height 19px
 			overflow hidden
 			text-overflow ellipsis
+
+		.reply
+			font-style italic
 
 #fancy-messages
 	height 70%
