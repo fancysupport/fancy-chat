@@ -1,7 +1,7 @@
 {{##def.message:param:
 	<div class="{{? param.incoming === true }}out{{??}}in{{?}} message">
 		<div class="info">
-			<img class="avatar" src="http://dummyimage.com/50/000/fff" />
+			<img class="avatar" src="{{! FancySupport.get_avatar(param.user_id) }}" />
 		</div>
 		<div class="text">
 			<div class="name">{{= FancySupport.users[param.user_id] }}</div>

@@ -85,7 +85,7 @@ gulp.task('minify', ['combine'], function() {
 gulp.task('watch', function() {
 	livereload.listen();
 
-	gulp.watch(['src/js/**/*','src/views/**/*','src/css/**/*'], ['combine']);
+	gulp.watch(['src/js/**/*','src/views/**/*','src/css/**/*'], ['minify']);
 
 	gulp.watch('dist/client.js').on('change', function(f) {
 		livereload().changed(f.path);

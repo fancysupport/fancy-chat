@@ -1,6 +1,6 @@
 {{##def.listing:
 	<div class="listing {{? v.unread === true }}unread{{?}}" data-id="{{= k }}">
-		<img class="avatar" src="http://dummyimage.com/50/000/fff" />
+		<img class="avatar" src="{{! FancySupport.get_avatar(v.user_id) }}" />
 		<div class="text">
 			<div class="title">{{= FancySupport.users[v.user_id] }}</div>
 			<div class="content">{{! v.content }}</div>

@@ -6,6 +6,7 @@ var FancySupport = {
 	node_unread: null,
 
 	old_onerror: null,
+	email_md5: '',
 
 	user: {},
 	users: {}, // id/name map for customer and staff
@@ -80,6 +81,9 @@ var FancySupport = {
 		this.impression();
 		this.get_messages();
 
+		// perform this once
+		this.email_md5 = this.md5(this.user.email);
+
 		this.users[''] = this.user.name;
 
 		setInterval(function() {
@@ -112,6 +116,14 @@ var FancySupport = {
 				return this ? this.replace(matchHTML, function(m) {return encodeHTMLRules[m] || m;}) : this;
 			};
 		}();
+	},
+
+	get_avatar: function(id) {
+		// if there's an id, it's a fancy dude
+		if (id)	return 'http://dummyimage.com/50/000/fff';
+
+		// else use gravatar
+		return 'https://secure.gravatar.com/avatar/' + this.email_md5 + '?d=retro';
 	},
 
 	impression: function() {
