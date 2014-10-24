@@ -1,7 +1,7 @@
 <div id="fancy-header"></div>
 
-<div class="body">
-	<div class="chat"></div>
+<div class="add-height">
+	<div class="chat add-height"></div>
 
 	<div id="fancy-listings"></div>
 </div>

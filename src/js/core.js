@@ -3,6 +3,8 @@ var FancySupport = {
 	node_chat: null,
 	node_listings: null,
 
+	node_unread: null,
+
 	old_onerror: null,
 
 	user: {},
@@ -25,6 +27,23 @@ var FancySupport = {
 		return s.join("&");
 	},
 
+	has_class: function(node, c) {
+		return -1 < node.className.indexOf(c);
+	},
+
+	add_class: function(node, c) {
+		if (node && ! this.has_class(node, c))
+			node.className += ' ' + c;
+	},
+
+	remove_class: function(node, c) {
+		if (node && this.has_class(node, c)) {
+			var classes = node.className.split(' ');
+			classes.splice(classes.indexOf(c), 1);
+			node.className = classes.join(' ');
+		}
+	},
+
 	init: function(options) {
 		var that = this;
 
@@ -45,6 +64,9 @@ var FancySupport = {
 		};
 
 		if (options.log_errors) window.onerror = new_onerror;
+
+		if (options.unread_counter)
+			this.node_unread = document.querySelector(options.unread_counter);
 
 		this.user = {
 			signature: options.signature,
@@ -157,12 +179,30 @@ var FancySupport = {
 			method: 'GET',
 			url: '/messages'
 		}, function(ok, err) {
-			// TODO diff between previous to find new messages and show notification
 			if (ok) {
 				that.threads = ok.data;
+				that.check_updates();
 				if (cb) cb();
 			}
 		});
+	},
+
+	check_updates: function() {
+		var updates = 0;
+
+		for (var i=0; i<this.threads.length; i++) {
+			var thread = this.threads[i];
+			var last_read = thread.last_read;
+
+			for (var j=0; j<thread.replies.length; j++) {
+				var reply = thread.replies[j];
+
+				if (reply.created > last_read) updates++;
+			}
+		}
+
+		if (updates > 0 && this.node_unread)
+			this.node_unread.innerHTML = updates;
 	},
 
 	update_active: function(cb) {
@@ -179,6 +219,19 @@ var FancySupport = {
 
 			if (cb) cb();
 		});
+	},
+
+	update_read: function(cb) {
+		var that = this;
+
+		if ( ! this.active) return;
+
+		this.ajax({
+			method: 'POST',
+			url: '/messages/' + this.active.id + '/read'
+		});
+
+		if (cb) cb();
 	},
 
 	click_send: function() {
@@ -305,7 +358,10 @@ var FancySupport = {
 		this.render_header({title: 'New Message', which: 'fancy-icon-list'});
 
 		this.node_chat.innerHTML = this.templates.chat();
+		this.remove_class(this.node_chat, 'fancy-hide');
+
 		this.node_listings.innerHTML = '';
+		this.add_class(this.node_listings, 'fancy-hide');
 
 		this.node_textarea = this.id('fancy-textarea');
 		this.messages = this.id('fancy-messages');
@@ -316,7 +372,14 @@ var FancySupport = {
 	},
 
 	render_existing_chat: function(data) {
+		var that = this;
+
 		this.render_header({title: 'Existing Message', which: 'fancy-icon-list'});
+
+		// since we're viewing it, update the read field
+		this.update_read(function() {
+			that.update_active();
+		});
 
 		var div = this.id('fancy-messages');
 
@@ -326,7 +389,10 @@ var FancySupport = {
 
 	render_listings: function() {
 		this.node_listings.innerHTML = this.templates.listings(this.threads);
+		this.remove_class(this.node_listings, 'fancy-hide');
+
 		this.node_chat.innerHTML = '';
+		this.add_class(this.node_chat, 'fancy-hide');
 	},
 
 	remove_widget: function() {
