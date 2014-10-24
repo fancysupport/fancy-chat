@@ -3,6 +3,8 @@ var FancySupport = {
 	node_chat: null,
 	node_listings: null,
 
+	old_onerror: null,
+
 	user: {},
 	users: {}, // id/name map for customer and staff
 	active: null,
@@ -26,7 +28,32 @@ var FancySupport = {
 	init: function(options) {
 		var that = this;
 
-		this.user = options;
+		this.old_onerror = window.onerror;
+		var new_onerror = function(error, file, line) {
+			var s = '';
+
+			s += error||'' + '\n';
+			s += file||'' + '\n';
+			s += line||'';
+
+			try {
+				//console.log(s);
+				that.error_event('error', s);
+			} catch(ex) {}
+
+			if (that.old_onerror) that.old_onerror.apply(this, arguments);
+		};
+
+		if (options.log_errors) window.onerror = new_onerror;
+
+		this.user = {
+			signature: options.signature,
+			app_key: options.app_key,
+			name: options.name,
+			email: options.email,
+			phone: options.phone,
+			customer_id: options.customer_id
+		};
 
 		this.impression();
 		this.get_messages();
