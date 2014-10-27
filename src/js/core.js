@@ -75,7 +75,9 @@ var FancySupport = {
 			name: options.name,
 			email: options.email,
 			phone: options.phone,
-			customer_id: options.customer_id
+			customer_id: options.customer_id,
+			avatar: options.avatar,
+			default_avatar: options.default_avatar
 		};
 
 		this.impression();
@@ -120,12 +122,19 @@ var FancySupport = {
 	},
 
 	get_avatar: function(id) {
+		var d = 'mm';
+
+		// if there's a default image given, or one of gravatars, use that
+		if (this.user.default_avatar) d = this.user.default_avatar;
+
 		// if there's an id, it's a fancy dude
 		if (id)
-			return this.app_icon ? 'http://cdn.fancy.support/'+this.app_icon : 'https://secure.gravatar.com/avatar/?d=mm';
+			return this.app_icon ? 'http://cdn.fancy.support/'+this.app_icon : 'https://secure.gravatar.com/avatar/?d=' + d;
 
-		// else use gravatar
-		return 'https://secure.gravatar.com/avatar/' + this.email_md5 + '?d=mm';
+		// use the avatar they gave us if available
+		if (this.user.avatar) return this.user.avatar;
+
+		return 'https://secure.gravatar.com/avatar/' + this.email_md5 + '?d=' + d;
 	},
 
 	impression: function() {
