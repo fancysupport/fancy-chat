@@ -79,6 +79,7 @@ var FancySupport = {
 		};
 
 		this.impression();
+		this.get_settings();
 		this.get_messages();
 
 		// perform this once
@@ -120,10 +121,11 @@ var FancySupport = {
 
 	get_avatar: function(id) {
 		// if there's an id, it's a fancy dude
-		if (id)	return 'http://dummyimage.com/50/000/fff';
+		if (id)
+			return this.app_icon ? 'http://cdn.fancy.support/'+this.app_icon : 'https://secure.gravatar.com/avatar/?d=mm';
 
 		// else use gravatar
-		return 'https://secure.gravatar.com/avatar/' + this.email_md5 + '?d=retro';
+		return 'https://secure.gravatar.com/avatar/' + this.email_md5 + '?d=mm';
 	},
 
 	impression: function() {
@@ -181,6 +183,34 @@ var FancySupport = {
 			url: '/events',
 			data: event,
 			json: true
+		});
+	},
+
+	get_settings: function() {
+		var that = this;
+
+		this.ajax({
+			method: 'GET',
+			url: '/settings'
+		}, function(ok, err) {
+			if (ok && ok.data) {
+				for (var id in ok.data) {
+					if (ok.data.hasOwnProperty(id) && ok.data[id] !== undefined) {
+						var value = ok.data[id];
+
+						switch(id) {
+							case 'app_icon':
+								that.app_icon = value; break;
+
+							case 'app_name':
+								that.app_name = value; break;
+
+							default:
+								that.users[id] = value;
+						}
+					}
+				}
+			}
 		});
 	},
 
@@ -305,7 +335,7 @@ var FancySupport = {
 	click_chats_update: function() {
 		var that = this;
 		this.render_listings();
-		this.render_header({title: 'Past Messages', which: 'fancy-icon-pencil'});
+		this.render_header({title: 'Previous Messages', which: 'fancy-icon-pencil'});
 
 		this.active = null;
 
@@ -370,7 +400,7 @@ var FancySupport = {
 	render_new_chat: function() {
 		var that = this;
 
-		this.render_header({title: 'New Message', which: 'fancy-icon-list'});
+		this.render_header({title: 'Message ' + this.app_name, which: 'fancy-icon-list'});
 
 		this.node_chat.innerHTML = this.templates.chat();
 		this.remove_class(this.node_chat, 'fancy-hide');
@@ -389,7 +419,7 @@ var FancySupport = {
 	render_existing_chat: function(data) {
 		var that = this;
 
-		this.render_header({title: 'Existing Message', which: 'fancy-icon-list'});
+		this.render_header({title: 'Message ' + this.app_name, which: 'fancy-icon-list'});
 
 		// since we're viewing it, update the read field
 		this.update_read(function() {
