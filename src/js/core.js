@@ -409,7 +409,7 @@ var FancySupport = {
 	render_new_chat: function() {
 		var that = this;
 
-		this.render_header({title: 'Message ' + this.app_name, which: 'fancy-icon-list'});
+		this.render_header({title: 'New Message to ' + this.app_name, which: 'fancy-icon-list'});
 
 		this.node_chat.innerHTML = this.templates.chat();
 		this.remove_class(this.node_chat, 'fancy-hide');
@@ -428,7 +428,7 @@ var FancySupport = {
 	render_existing_chat: function(data) {
 		var that = this;
 
-		this.render_header({title: 'Message ' + this.app_name, which: 'fancy-icon-list'});
+		this.render_header({title: 'New Message to ' + this.app_name, which: 'fancy-icon-list'});
 
 		// since we're viewing it, update the read field
 		this.update_read(function() {

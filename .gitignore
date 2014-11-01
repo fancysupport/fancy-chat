@@ -8,6 +8,8 @@ node_modules/
 
 build/*
 
+siggen.js
+
 dist/client.js
 dist/client.min.js
 
