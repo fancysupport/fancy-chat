@@ -45,6 +45,13 @@ var FancySupport = {
 		}
 	},
 
+	addEvent: function(event, node, fn) {
+		if (node.addEventListener)
+			node.addEventListener(event, fn);
+		else if (node.attachEvent)
+			node.attachEvent('on'+event, fn);
+	},
+
 	init: function(options) {
 		var that = this;
 
@@ -92,8 +99,7 @@ var FancySupport = {
 			that.get_messages();
 		}, 10*60*1000);
 
-		document.querySelector(options.activator)
-		.addEventListener('click', function() {
+		this.addEvent('click', document.querySelector(options.activator), function() {
 			that.render_widget();
 			that.render_new_chat();
 
@@ -357,7 +363,7 @@ var FancySupport = {
 
 		var convos = document.querySelectorAll('.listing');
 		for (var i=0; i<convos.length; i++) {
-			convos[i].addEventListener('click', fn);
+			this.addEvent('click', convos[i], fn);
 		}
 	},
 
@@ -398,9 +404,9 @@ var FancySupport = {
 		var chatsFn = function() { that.click_chats(); };
 		var newFn = function() { that.render_new_chat(); };
 
-		this.id('fancy-newchats').addEventListener('click', data.which == 'fancy-icon-pencil' ? newFn : chatsFn);
+		this.addEvent('click', this.id('fancy-newchats'), data.which == 'fancy-icon-pencil' ? newFn : chatsFn);
 
-		this.id('fancy-close').addEventListener('click', function() {
+		this.addEvent('click', this.id('fancy-close'), function() {
 			that.remove_widget();
 		});
 	},
@@ -419,7 +425,7 @@ var FancySupport = {
 		this.node_textarea = this.id('fancy-textarea');
 		this.messages = this.id('fancy-messages');
 
-		this.id('fancy-send').addEventListener('click', function() {
+		this.addEvent('click', this.id('fancy-send'), function() {
 			that.click_send();
 		});
 	},
