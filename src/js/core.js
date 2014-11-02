@@ -485,6 +485,8 @@ var FancySupport = {
 			return {code: req.status, data: result};
 		};
 
+		if (opts.method === 'GET') opts.url += '?bust=' + (new Date()).getTime();
+
 		var XHR = XMLHttpRequest || ActiveXObject;
 		var request = new XHR('MSXML2.XMLHTTP.3.0');
 		request.open(opts.method, that.url+opts.url, true);
