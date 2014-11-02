@@ -176,20 +176,24 @@ var FancySupport = {
 		this.ajax({method: 'POST', url: '/impression', data: impression});
 	},
 
-	info_event: function(name, desc) {
-		this.event(name, desc, 'info');
+	info_event: function(name, desc, cb) {
+		this.event(name, desc, 'info', cb);
 	},
 
-	warning_event: function(name, desc) {
-		this.event(name, desc, 'warning');
+	warning_event: function(name, desc, cb) {
+		this.event(name, desc, 'warning', cb);
 	},
 
-	error_event: function(name, desc) {
-		this.event(name, desc, 'critical');
+	error_event: function(name, desc, cb) {
+		this.event(name, desc, 'critical', cb);
 	},
 
-	event: function(name, desc, level) {
+	event: function(name, desc, level, cb) {
 		if ( ! name) return; // no event, so go home
+		if (typeof desc === 'function') {
+			cb = desc;
+			desc = '';
+		}
 
 		level = level || 'info';
 
@@ -206,7 +210,7 @@ var FancySupport = {
 			url: '/events',
 			data: event,
 			json: true
-		});
+		}, cb);
 	},
 
 	get_settings: function() {
