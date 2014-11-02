@@ -28,8 +28,17 @@ var FancySupport = {
 		return s.join("&");
 	},
 
+	indexOf: function(arr, e) {
+		for (var i=0; i<arr.length; i++) {
+			if (arr[i] === e) return i;
+		}
+
+		return -1;
+	},
+
 	has_class: function(node, c) {
-		return -1 < node.className.indexOf(c);
+		var classes = node.className.split(' ');
+		return -1 < FancySupport.indexOf(classes, c);
 	},
 
 	add_class: function(node, c) {
@@ -40,7 +49,7 @@ var FancySupport = {
 	remove_class: function(node, c) {
 		if (node && this.has_class(node, c)) {
 			var classes = node.className.split(' ');
-			classes.splice(classes.indexOf(c), 1);
+			classes.splice(FancySupport.indexOf(classes, c), 1);
 			node.className = classes.join(' ');
 		}
 	},
@@ -353,7 +362,7 @@ var FancySupport = {
 
 		this.active = null;
 
-		var fn = function() {
+		var fn = function(e) {
 			var id = this.getAttribute("data-id");
 			that.active = that.threads[id];
 
@@ -363,7 +372,10 @@ var FancySupport = {
 
 		var convos = document.querySelectorAll('.listing');
 		for (var i=0; i<convos.length; i++) {
-			this.addEvent('click', convos[i], fn);
+			var e = convos[i];
+			//this.addEvent('click', convos[i], fn);
+			// FIXME this is shit, can't get the correct element to get data-id from
+			convos[i].onclick = fn;
 		}
 	},
 
