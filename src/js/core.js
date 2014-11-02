@@ -57,7 +57,6 @@ var FancySupport = {
 			s += line||'';
 
 			try {
-				//console.log(s);
 				that.error_event('error', s);
 			} catch(ex) {}
 
@@ -439,7 +438,7 @@ var FancySupport = {
 
 		div.innerHTML = this.templates.messages(this.active);
 		div.scrollTop = div.scrollHeight;
-	}, 
+	},
 
 	render_listings: function() {
 		this.node_listings.innerHTML = this.templates.listings(this.threads);
