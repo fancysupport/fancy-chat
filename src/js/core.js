@@ -176,34 +176,18 @@ var FancySupport = {
 		this.ajax({method: 'POST', url: '/impression', data: impression});
 	},
 
-	info_event: function(name, desc, cb) {
-		this.event(name, desc, 'info', cb);
-	},
-
-	warning_event: function(name, desc, cb) {
-		this.event(name, desc, 'warning', cb);
-	},
-
-	error_event: function(name, desc, cb) {
-		this.event(name, desc, 'critical', cb);
-	},
-
-	event: function(name, desc, level, cb) {
-		if ( ! name) return; // no event, so go home
-		if (typeof desc === 'function') {
-			cb = desc;
-			desc = '';
-		}
-
-		level = level || 'info';
+	event: function(opts, cb) {
+		// nothing or no name, so go home
+		if ( ! opts || ! opts.name) return;
 
 		// set them all to strings since numbers produce errors
 		var event = {
 			customer_id: this.user.customer_id,
-			name: ''+name,
-			description: ''+desc,
-			level: ''+level
+			name: ''+opts.name
 		};
+
+		if (opts.desc) event.description = ''+opts.desc;
+		if (opts.data) event.custom_data = opts.data;
 
 		this.ajax({
 			method: 'POST',
@@ -362,7 +346,7 @@ var FancySupport = {
 	click_chats_update: function() {
 		var that = this;
 		this.render_listings();
-		this.render_header({title: 'Previous Messages', which: 'fancy-icon-pencil'});
+		this.render_header({title: this.app_name, which: 'fancy-icon-pencil'});
 
 		this.active = null;
 
@@ -430,7 +414,7 @@ var FancySupport = {
 	render_new_chat: function() {
 		var that = this;
 
-		this.render_header({title: 'New Message to ' + this.app_name, which: 'fancy-icon-list'});
+		this.render_header({title: 'New Message', which: 'fancy-icon-list'});
 
 		this.node_chat.innerHTML = this.templates.chat();
 		this.remove_class(this.node_chat, 'fancy-hide');
@@ -449,7 +433,7 @@ var FancySupport = {
 	render_existing_chat: function(data) {
 		var that = this;
 
-		this.render_header({title: 'New Message to ' + this.app_name, which: 'fancy-icon-list'});
+		this.render_header({title: this.app_name, which: 'fancy-icon-list'});
 
 		// since we're viewing it, update the read field
 		this.update_read(function() {
