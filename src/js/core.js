@@ -75,8 +75,8 @@ var FancySupport = {
 			throw "Fancy needs an application key field: app_key.";
 
 		this.options = {
-			signature: options.signature,
 			app_key: options.app_key,
+			signature: options.signature,
 			default_avatar: options.default_avatar
 		};
 
@@ -166,6 +166,15 @@ var FancySupport = {
 
 			if ( ! user.customer_id)
 				throw "Fancy needs a customer id field: customer_id.";
+
+			// check if we're changing customer
+			if (this.user.customer_id && this.user.customer_id !== user.customer_id) {
+				// if this new customer doesn't have a sig, problems occur
+				if ( ! user.signature)
+					throw "Fancy needs a customer signature field: signature";
+				else
+					this.options.signature = user.signature;
+			}
 
 			// assign user properties, default to blank if empty
 			this.user = {
