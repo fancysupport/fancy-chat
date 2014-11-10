@@ -8,7 +8,8 @@ var FancySupport = {
 	old_onerror: null,
 	email_md5: '',
 
-	user: {},
+	user: {}, // user information
+	options: {}, // storing app key etc
 	users: {}, // id/name map for customer and staff
 	active: null,
 	threads: [],
@@ -64,6 +65,21 @@ var FancySupport = {
 	init: function(options) {
 		var that = this;
 
+		if (typeof options !== 'object')
+			throw "Fancy needs a config object to run.";
+
+		if ( ! options.signature)
+			throw "Fancy needs a customer signature field: signature";
+
+		if ( ! options.app_key)
+			throw "Fancy needs an application key field: app_key.";
+
+		this.options = {
+			signature: options.signature,
+			app_key: options.app_key,
+			default_avatar: options.default_avatar
+		};
+
 		this.old_onerror = window.onerror;
 		var new_onerror = function(error, file, line) {
 			try {
@@ -86,18 +102,7 @@ var FancySupport = {
 		if (options.unread_counter)
 			this.node_unread = document.querySelector(options.unread_counter);
 
-		this.user = {
-			signature: options.signature,
-			app_key: options.app_key,
-			name: options.name,
-			email: options.email,
-			phone: options.phone,
-			customer_id: options.customer_id,
-			avatar: options.avatar,
-			default_avatar: options.default_avatar
-		};
-
-		this.impression();
+		this.impression(options);
 		this.get_settings();
 		this.get_messages();
 
@@ -153,22 +158,28 @@ var FancySupport = {
 		return 'https://secure.gravatar.com/avatar/' + this.email_md5 + '?d=' + d;
 	},
 
-	impression: function() {
-		if ( ! this.user)
-			throw "Fancy needs a user object to run.";
+	impression: function(user) {
+		// if there's an object - check it has the right stuff
+		if (user) {
+			if(typeof user !== 'object')
+				throw "Fancy needs a user object to run.";
 
-		if ( ! this.user.signature)
-			throw "Fancy needs a customer signature field: signature";
+			if ( ! user.customer_id)
+				throw "Fancy needs a customer id field: customer_id.";
 
-		if ( ! this.user.app_key)
-			throw "Fancy needs an application key field: app_key.";
-
-		if ( ! this.user.customer_id)
-			throw "Fancy needs a customer id field: customer_id.";
+			// assign user properties, default to blank if empty
+			this.user = {
+				name: user.name || '',
+				email: user.email || '',
+				phone: user.phone || '',
+				customer_id: user.customer_id,
+				avatar: user.avatar || ''
+			};
+		}
 
 		var impression = this.build_query_string({
-			signature: this.user.signature,
-			app_key: this.user.app_key,
+			signature: this.options.signature,
+			app_key: this.options.app_key,
 			customer_id: this.user.customer_id,
 			name: this.user.name,
 			email: this.user.email,
@@ -487,9 +498,9 @@ var FancySupport = {
 		} else
 			request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 
-		request.setRequestHeader('X-App-Key', that.user.app_key);
+		request.setRequestHeader('X-App-Key', that.options.app_key);
 		request.setRequestHeader('X-Customer-Id', that.user.customer_id);
-		request.setRequestHeader('X-Signature', that.user.signature);
+		request.setRequestHeader('X-Signature', that.options.signature);
 
 		request.onreadystatechange = function () {
 			if (request.readyState === 4 && cb) {
