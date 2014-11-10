@@ -109,6 +109,9 @@ var FancySupport = {
 
 		// perform this once
 		this.email_md5 = this.md5(this.user.email);
+		// preload avatar
+		var img = new Image();
+		img.src = this.get_avatar();
 
 		this.users[''] = this.user.name;
 
@@ -148,7 +151,7 @@ var FancySupport = {
 		var d = 'mm';
 
 		// if there's a default image given, or one of gravatars, use that
-		if (this.user.default_avatar) d = this.user.default_avatar;
+		if (this.options.default_avatar) d = this.options.default_avatar;
 
 		// if there's an id, it's a fancy dude
 		if (id)
@@ -235,7 +238,10 @@ var FancySupport = {
 
 						switch(id) {
 							case 'app_icon':
-								that.app_icon = value; break;
+								that.app_icon = value;
+								var img = new Image();
+								img.src = that.get_avatar(true);
+								break;
 
 							case 'app_name':
 								that.app_name = value; break;
