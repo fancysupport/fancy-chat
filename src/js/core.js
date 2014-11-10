@@ -122,6 +122,7 @@ var FancySupport = {
 
 			if (that.active) {
 				// get something out quick
+				that.current_view = 'existing';
 				that.render_existing_chat();
 
 				// get the most recent version of active
@@ -367,6 +368,8 @@ var FancySupport = {
 	},
 
 	click_chats_update: function() {
+		if (this.current_view !== 'listing') return;
+
 		var that = this;
 
 		this.render_listings();
@@ -436,6 +439,7 @@ var FancySupport = {
 	},
 
 	render_new_chat: function() {
+		this.current_view = 'new';
 		var that = this;
 
 		this.render_header({title: 'New Message', which: 'fancy-icon-list'});
@@ -485,6 +489,7 @@ var FancySupport = {
 	},
 
 	remove_widget: function() {
+		this.current_view = null;
 		document.body.removeChild(this.id('fancy-chat'));
 		this.messages = null;
 		this.node_textarea = null;
