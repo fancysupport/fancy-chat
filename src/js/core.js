@@ -12,6 +12,7 @@ var FancySupport = {
 	options: {}, // storing app key etc
 	users: {}, // id/name map for customer and staff
 	active: null,
+	current_view: null,
 	threads: [],
 	url: 'http://api.fancysupport.com:4000/client',
 
@@ -367,9 +368,8 @@ var FancySupport = {
 
 	click_chats_update: function() {
 		var that = this;
-		this.render_listings();
-		this.render_header({title: this.app_name, which: 'fancy-icon-pencil'});
 
+		this.render_listings();
 		this.active = null;
 
 		var fn = function(e) {
@@ -377,6 +377,7 @@ var FancySupport = {
 			that.active = that.threads[id];
 
 			that.render_new_chat();
+			that.current_view = 'existing';
 			that.render_existing_chat();
 		};
 
@@ -392,10 +393,11 @@ var FancySupport = {
 	click_chats: function() {
 		var that = this;
 
-		// show what we have so its quick
+		// show what we have so it's quick
+		that.current_view = 'listing';
 		this.click_chats_update();
 
-		// get new stuff too so it right
+		// get new stuff too so it's right
 		this.get_messages(function() {
 			that.click_chats_update();
 		});
@@ -453,6 +455,8 @@ var FancySupport = {
 	},
 
 	render_existing_chat: function(data) {
+		if (this.current_view !== 'existing') return;
+
 		var that = this;
 
 		this.render_header({title: this.app_name, which: 'fancy-icon-list'});
@@ -469,6 +473,10 @@ var FancySupport = {
 	},
 
 	render_listings: function() {
+		if (this.current_view !== 'listing') return;
+
+		this.render_header({title: this.app_name, which: 'fancy-icon-pencil'});
+
 		this.node_listings.innerHTML = this.templates.listings(this.threads);
 		this.remove_class(this.node_listings, 'fancy-hide');
 
