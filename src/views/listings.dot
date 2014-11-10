@@ -10,6 +10,11 @@
 	</div>
 #}}
 
-{{~ it :v:k }}
-	{{#def.listing}}
-{{~}}
+<div class="listings">
+	{{~ it :v:k }}
+		{{#def.listing}}
+	{{~}}
+</div>
+<div class="powered-by">
+	<a href="http://FancySupport.com">Powered by Fancy Support</a>
+</div>

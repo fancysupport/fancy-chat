@@ -346,6 +346,7 @@ var FancySupport = {
 					data.user_id = '';
 					that.active.replies.push(data);
 
+					that.current_view = 'existing';
 					that.render_existing_chat();
 
 					that.update_active(function() {
@@ -367,6 +368,7 @@ var FancySupport = {
 					ok.data.replies = [];
 					that.active = ok.data;
 					that.threads.push(that.active);
+					that.current_view = 'existing';
 					that.render_existing_chat();
 				}
 			});

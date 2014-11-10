@@ -166,53 +166,69 @@ mborder(dir)
 		font-size 24px
 
 #fancy-listings
-	height 85%
-	overflow-y auto
-	mborder(left)
-	mborder(right)
-	mborder(bottom)
-	border-bottom-left-radius 4px
-	border-bottom-right-radius 4px
+	height 100%
 
-	.listing
-		cursor pointer
-		padding 10px 20px
-		position relative
-		color #7f8c8d
+	.powered-by
+		text-align center
+		height 5%
+		width 100%
+		mborder(bottom)
+		mborder(left)
+		mborder(right)
+		border-bottom-left-radius 4px
+		border-bottom-right-radius 4px
+		padding-top 5px
 
-		&.unread
-			color #000
+		a
+			text-decoration none
+			color #7F8C8D
+			font-size 14px
 
-		.avatar
-			position absolute
-			top 16px
-			width 50px
-			height 50px
+	.listings
+		height 80%
+		overflow-y auto
+		mborder(left)
+		mborder(right)
 
-		.text
-			margin-left 60px
-			margin-top 5px
+		.listing
+			cursor pointer
+			padding 10px 20px
+			position relative
+			color #7f8c8d
 
-		&:hover
-			background-color #D3D3D3
+			&.unread
+				color #000
 
-		.title
-			font-weight bold
+			.avatar
+				position absolute
+				top 16px
+				width 50px
+				height 50px
 
-		.time
-			position absolute
-			right 20px
-			top 9px
-			color #808080
-			font-size 12px
+			.text
+				margin-left 60px
+				margin-top 5px
 
-		.content
-			height 19px
-			overflow hidden
-			text-overflow ellipsis
+			&:hover
+				background-color #D3D3D3
 
-		.reply
-			font-style italic
+			.title
+				font-weight bold
+
+			.time
+				position absolute
+				right 20px
+				top 9px
+				color #808080
+				font-size 12px
+
+			.content
+				height 19px
+				overflow hidden
+				text-overflow ellipsis
+
+			.reply
+				font-style italic
 
 #fancy-messages
 	height 70%
