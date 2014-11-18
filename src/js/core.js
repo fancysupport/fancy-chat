@@ -81,6 +81,19 @@ var FancySupport = {
 			default_avatar: options.default_avatar
 		};
 
+		this.user = {};
+
+		if ( ! options.customer_id)
+			throw "Fancy needs a customer id field: customer_id.";
+
+		this.user.customer_id = options.customer_id;
+
+		if (options.name) this.user.name = options.name;
+		if (options.email) this.user.email = options.email;
+		if (options.phone) this.user.phone = options.phone;
+		if (options.avatar) this.user.avatar = options.avatar;
+		if (options.custom_data) this.user.custom_data = options.custom_data;
+
 		this.old_onerror = window.onerror;
 		var new_onerror = function(error, file, line) {
 			try {
@@ -103,12 +116,13 @@ var FancySupport = {
 		if (options.unread_counter)
 			this.node_unread = document.querySelector(options.unread_counter);
 
-		this.impression(options);
+		this.impression();
 		this.get_settings();
 		this.get_messages();
 
 		// perform this once
 		this.email_md5 = this.md5(this.user.email);
+
 		// preload avatar
 		var img = new Image();
 		img.src = this.get_avatar();
@@ -163,44 +177,15 @@ var FancySupport = {
 		return 'https://secure.gravatar.com/avatar/' + this.email_md5 + '?d=' + d;
 	},
 
-	impression: function(user) {
-		// if there's an object - check it has the right stuff
-		if (user) {
-			if(typeof user !== 'object')
-				throw "Fancy needs a user object to run.";
+	impression: function() {
+		var impression = {};
 
-			if ( ! user.customer_id)
-				throw "Fancy needs a customer id field: customer_id.";
+		if (this.user.name) impression.name = this.user.name;
+		if (this.user.email) impression.email = this.user.email;
+		if (this.user.phone) impression.phone = this.user.phone;
+		if (this.user.custom_data) impression.custom_data = this.user.custom_data;
 
-			// check if we're changing customer
-			if (this.user.customer_id && this.user.customer_id !== user.customer_id) {
-				// if this new customer doesn't have a sig, problems occur
-				if ( ! user.signature)
-					throw "Fancy needs a customer signature field: signature";
-				else
-					this.options.signature = user.signature;
-			}
-
-			// assign user properties, default to blank if empty
-			this.user = {
-				name: user.name || '',
-				email: user.email || '',
-				phone: user.phone || '',
-				customer_id: user.customer_id,
-				avatar: user.avatar || ''
-			};
-		}
-
-		var impression = this.build_query_string({
-			signature: this.options.signature,
-			app_key: this.options.app_key,
-			customer_id: this.user.customer_id,
-			name: this.user.name,
-			email: this.user.email,
-			phone: this.user.phone
-		});
-
-		this.ajax({method: 'POST', url: '/impression', data: impression});
+		this.ajax({method: 'POST', url: '/impression', data: impression, json: true});
 	},
 
 	event: function(opts, cb) {
@@ -209,7 +194,6 @@ var FancySupport = {
 
 		// set them all to strings since numbers produce errors
 		var event = {
-			customer_id: this.user.customer_id,
 			name: ''+opts.name
 		};
 
@@ -328,8 +312,7 @@ var FancySupport = {
 		if (message === '') return;
 
 		var data = {
-			content: message,
-			customer_id: this.user.customer_id
+			content: message
 		};
 
 		if (this.active) { // replying to an existing conversation
@@ -570,6 +553,6 @@ var FancySupport = {
 			span[1] += (span[0] === 0 || span[0] > 1) ? 's' : '';
 			span = span.join(' ');
 
-			return (time <= local)  ? span + ' ago' : 'in ' + span;
+			return span + ' ago';
 	}
 };
