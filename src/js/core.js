@@ -66,14 +66,20 @@ var FancySupport = {
 	init: function(options) {
 		var that = this;
 
-		if (typeof options !== 'object')
-			throw "Fancy needs a config object to run.";
+		if (typeof options !== 'object') {
+			console.error("Fancy needs a config object to run.");
+			return;
+		}
 
-		if ( ! options.signature)
-			throw "Fancy needs a customer signature field: signature";
+		if ( ! options.signature) {
+			console.error("Fancy needs a customer signature field: signature");
+			return;
+		}
 
-		if ( ! options.app_key)
-			throw "Fancy needs an application key field: app_key.";
+		if ( ! options.app_key) {
+			console.error("Fancy needs an application key field: app_key.");
+			return;
+		}
 
 		this.options = {
 			app_key: options.app_key,
@@ -83,8 +89,10 @@ var FancySupport = {
 
 		this.user = {};
 
-		if ( ! options.customer_id)
-			throw "Fancy needs a customer id field: customer_id.";
+		if ( ! options.customer_id) {
+			console.error("Fancy needs a customer id field: customer_id.");
+			return;
+		}
 
 		this.user.customer_id = options.customer_id;
 
@@ -92,7 +100,13 @@ var FancySupport = {
 		if (options.email) this.user.email = options.email;
 		if (options.phone) this.user.phone = options.phone;
 		if (options.avatar) this.user.avatar = options.avatar;
-		if (options.custom_data) this.user.custom_data = options.custom_data;
+
+		if (options.custom_data) {
+			if (typeof options.custom_data === 'object')
+				this.user.custom_data = options.custom_data;
+			else
+				console.error('Fancy custom_data needs to be an object.');
+		}
 
 		this.old_onerror = window.onerror;
 		var new_onerror = function(error, file, line) {
