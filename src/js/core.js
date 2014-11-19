@@ -472,6 +472,10 @@ var FancySupport = {
 
 		this.render_header({title: this.app_name, which: 'fancy-icon-pencil'});
 
+		this.threads.sort(function(a, b) {
+			return (! a.unread && b.unread) || a.updated < b.updated;
+		});
+
 		this.node_listings.innerHTML = this.templates.listings(this.threads);
 		this.remove_class(this.node_listings, 'fancy-hide');
 
