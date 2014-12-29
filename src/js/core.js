@@ -149,7 +149,6 @@ var FancySupport = {
 
 		this.addEvent('click', document.querySelector(options.activator), function() {
 			that.render_widget();
-			that.render_new_chat();
 
 			if (that.active) {
 				// get something out quick
@@ -162,6 +161,7 @@ var FancySupport = {
 				});
 			} else {
 				// get new versions on open
+				that.render_new_chat();
 				that.get_messages();
 			}
 		});
@@ -384,7 +384,6 @@ var FancySupport = {
 			var id = this.getAttribute("data-id");
 			that.active = that.threads[id];
 
-			that.render_new_chat();
 			that.current_view = 'existing';
 			that.render_existing_chat();
 		};
@@ -443,13 +442,15 @@ var FancySupport = {
 		});
 	},
 
-	render_new_chat: function() {
+	render_new_chat: function(reply) {
 		this.current_view = 'new';
 		var that = this;
 
-		this.render_header({title: 'New Message', which: 'fancy-icon-list'});
+		// don't need to render this if we're just going to overwrite it
+		if ( ! reply) this.render_header({title: 'New Message', which: 'fancy-icon-list'});
 
-		this.node_chat.innerHTML = this.templates.chat();
+		var phrase = reply ? 'Reply to ' : 'Send a message to ';
+		this.node_chat.innerHTML = this.templates.chat(phrase + this.app_name);
 		this.remove_class(this.node_chat, 'fancy-hide');
 
 		this.node_listings.innerHTML = '';
@@ -465,6 +466,8 @@ var FancySupport = {
 
 	render_existing_chat: function(data) {
 		if (this.current_view !== 'existing') return;
+
+		this.render_new_chat(true);
 
 		var that = this;
 
