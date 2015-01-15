@@ -285,7 +285,9 @@ var FancySupport = {
 			}
 		}
 
-		if (updates > 0 && this.node_unread)
+		if (updates === 0) updates = '';
+
+		if (this.node_unread)
 			this.node_unread.innerHTML = updates;
 	},
 
