@@ -426,6 +426,8 @@ var FancySupport = {
 
 		this.node_chat = document.querySelector('#fancy-chat .chat');
 		this.node_listings = this.id('fancy-listings');
+
+		this.add_class(document.querySelector('body'), 'fancy-no-scroll');
 	},
 
 	render_header: function(data) {
@@ -507,6 +509,8 @@ var FancySupport = {
 		document.body.removeChild(this.id('fancy-chat'));
 		this.messages = null;
 		this.node_textarea = null;
+
+		this.remove_class(document.querySelector('body'), 'fancy-no-scroll');
 	},
 
 	ajax: function (opts, cb) {
