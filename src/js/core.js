@@ -475,10 +475,12 @@ var FancySupport = {
 
 		this.render_header({title: this.app_name, which: 'fancy-icon-list'});
 
-		// since we're viewing it, update the read field
-		this.update_read(function() {
-			that.update_active();
-		});
+		// if this thread has unread messages, send a read call
+		if (this.active.unread) {
+			this.update_read(function() {
+				that.update_active();
+			});
+		}
 
 		var div = this.id('fancy-messages');
 
