@@ -1,19 +1,4 @@
 var FancySupport = {
-	node_textarea: null,
-	node_chat: null,
-	node_listings: null,
-
-	node_unread: null,
-
-	old_onerror: null,
-	email_md5: '',
-
-	user: {}, // user information
-	options: {}, // storing app key etc
-	users: {}, // id/name map for customer and staff
-	active: null,
-	current_view: null,
-	threads: [],
 	url: 'http://api.fancysupport.com:4000/client',
 
 	id: function(id) {
@@ -63,6 +48,31 @@ var FancySupport = {
 			node.attachEvent('on'+event, fn);
 	},
 
+	removeEvent: function(event, node, fn) {
+		if (node.removeEventListener)
+			node.removeEventListener(event, fn);
+		else if (node.detachEvent)
+			node.detachEvent('on'+event, fn);
+	},
+
+	set_defaults: function() {
+		this.node_textarea = null;
+		this.node_chat = null;
+		this.node_listings = null;
+
+		this.node_unread = null;
+
+		this.old_onerror = null;
+		this.email_md5 = '';
+
+		this.user = {}; // user information
+		this.options = {}; // storing app key etc
+		this.users = {}; // id/name map for customer and staff
+		this.active = null;
+		this.current_view = null;
+		this.threads = [];
+	},
+
 	init: function(options) {
 		var that = this;
 
@@ -81,18 +91,20 @@ var FancySupport = {
 			return;
 		}
 
-		this.options = {
-			app_key: options.app_key,
-			signature: options.signature,
-			default_avatar: options.default_avatar
-		};
-
-		this.user = {};
-
 		if ( ! options.customer_id) {
 			console.error("Fancy needs a customer id field: customer_id.");
 			return;
 		}
+
+		// setup initial settings
+		this.set_defaults();
+
+		this.options = {
+			app_key: options.app_key,
+			signature: options.signature,
+			default_avatar: options.default_avatar,
+			activator: options.activator
+		};
 
 		this.user.customer_id = options.customer_id;
 
@@ -147,7 +159,8 @@ var FancySupport = {
 			that.get_messages();
 		}, 10*60*1000);
 
-		this.addEvent('click', document.querySelector(options.activator), function() {
+		// save a reference to this function because we need it for when we unlisten
+		this.click_handler = function() {
 			that.render_widget();
 
 			if (that.active) {
@@ -164,7 +177,9 @@ var FancySupport = {
 				that.render_new_chat();
 				that.get_messages();
 			}
-		});
+		};
+
+		this.addEvent('click', document.querySelector(this.options.activator), this.click_handler);
 
 		String.prototype.encodeHTML = function() {
 			var encodeHTMLRules = { "&": "&#38;", "<": "&#60;", ">": "&#62;", '"': '&#34;', "'": '&#39;', "/": '&#47;' },
@@ -220,6 +235,12 @@ var FancySupport = {
 			data: event,
 			json: true
 		}, cb);
+	},
+
+	remove: function() {
+		this.removeEvent('click', document.querySelector(this.options.activator), this.click_handler);
+		this.set_defaults();
+		this.remove_widget();
 	},
 
 	get_settings: function() {
@@ -506,9 +527,11 @@ var FancySupport = {
 
 	remove_widget: function() {
 		this.current_view = null;
-		document.body.removeChild(this.id('fancy-chat'));
 		this.messages = null;
 		this.node_textarea = null;
+
+		var chat = this.id('fancy-chat');
+		if (chat) document.body.removeChild(chat);
 	},
 
 	ajax: function (opts, cb) {
