@@ -60,8 +60,6 @@ var FancySupport = {
 		this.node_chat = null;
 		this.node_listings = null;
 
-		this.node_unread = null;
-
 		this.old_onerror = null;
 		this.email_md5 = '';
 
@@ -103,7 +101,8 @@ var FancySupport = {
 			app_key: options.app_key,
 			signature: options.signature,
 			default_avatar: options.default_avatar,
-			activator: options.activator
+			activator: options.activator,
+			unread_counter: options.unread_counter
 		};
 
 		this.user.customer_id = options.customer_id;
@@ -138,9 +137,6 @@ var FancySupport = {
 		};
 
 		if (options.log_errors) window.onerror = new_onerror;
-
-		if (options.unread_counter)
-			this.node_unread = document.querySelector(options.unread_counter);
 
 		this.impression();
 		this.get_settings();
@@ -308,8 +304,10 @@ var FancySupport = {
 
 		if (updates === 0) updates = '';
 
-		if (this.node_unread)
-			this.node_unread.innerHTML = updates;
+		if (this.options.unread_counter) {
+			var node = document.querySelector(this.options.unread_counter);
+			node.innerHTML = updates;
+		}
 	},
 
 	update_active: function(cb) {
