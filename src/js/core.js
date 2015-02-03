@@ -233,7 +233,7 @@ var FancySupport = {
 		}, cb);
 	},
 
-	remove: function() {
+	clear: function() {
 		this.removeEvent('click', document.querySelector(this.options.activator), this.click_handler);
 		this.set_defaults();
 		this.remove_widget();
