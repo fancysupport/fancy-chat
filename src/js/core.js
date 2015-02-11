@@ -169,9 +169,13 @@ var FancySupport = {
 					that.render_existing_chat();
 				});
 			} else {
-				// get new versions on open
-				that.render_new_chat();
-				that.get_messages();
+				if (that.has_unreads()) {
+					that.click_chats();
+				} else {
+					// get new versions on open
+					that.render_new_chat();
+					that.get_messages();
+				}
 			}
 		};
 
@@ -283,6 +287,12 @@ var FancySupport = {
 				if (cb) cb();
 			}
 		});
+	},
+
+	has_unreads: function() {
+		for (var i=0; i<this.threads.length; i++) {
+			if (this.threads[i].unread) return true;
+		}
 	},
 
 	check_updates: function() {
