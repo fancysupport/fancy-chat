@@ -508,6 +508,7 @@ var FancySupport = {
 		if (this.active.unread) {
 			this.update_read(function() {
 				that.update_active();
+				that.check_updates();
 			});
 		}
 
