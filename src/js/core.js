@@ -122,15 +122,19 @@ var FancySupport = {
 		this.old_onerror = window.onerror;
 		var new_onerror = function(error, file, line) {
 			try {
-				that.event({
+				var e = {
 					name: 'error',
-					desc: 'A JavaScript error occured on the client.',
-					data: {
-						error: error||'',
-						file: file||'',
-						line: line||''
-					}
-				});
+				};
+
+				if (error) e.desc = ''+error;
+
+				if (file || line) {
+					e.data = {};
+					if (file) e.data.file = ''+file;
+					if (line) e.data.line = ''+line;
+				}
+
+				that.event(e);
 			} catch(ex) {}
 
 			if (that.old_onerror) that.old_onerror.apply(this, arguments);
