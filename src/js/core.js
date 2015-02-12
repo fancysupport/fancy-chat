@@ -213,6 +213,7 @@ var FancySupport = {
 		if (this.user.email) impression.email = this.user.email;
 		if (this.user.phone) impression.phone = this.user.phone;
 		if (this.user.custom_data) impression.custom_data = this.user.custom_data;
+		impression.resolution = [window.innerWidth, window.innerHeight];
 
 		this.ajax({method: 'POST', url: '/impression', data: impression, json: true});
 	},
