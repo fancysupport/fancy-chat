@@ -319,7 +319,9 @@ function _check_updates() {
 		for (var j=0; j<thread.replies.length; j++) {
 			var reply = thread.replies[j];
 
-			if (reply.created > last_read) {
+			// check if it's after they've last seen, and not a message
+			// that they have sent
+			if (reply.created > last_read && ! reply.incoming) {
 				updates++;
 				thread.unread = true;
 			}
