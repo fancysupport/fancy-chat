@@ -3,7 +3,18 @@ var _OLD_ONERROR; // previous value of window.onerror
 var _URL = 'http://api.fancysupport.com:4000/client';
 var _APP_NAME;
 var _APP_ICON;
+var _EMAIL_MD5;
 var _CURRENT_VIEW;
+var _SETTINGS; // storing appkey etc
+var _USER;
+var _USERS;
+var _ACTIVE_THREAD;
+var _THREADS;
+
+var _NODE_TEXTAREA;
+var _NODE_CHAT;
+var _NODE_LISTINGS;
+
 
 function _has_class(node, c) {
 	var classes = node.className.split(' ');
@@ -50,18 +61,19 @@ function _remove_event(event, node, fn) {
 }
 
 function _set_defaults() {
-	FancySupport.node_textarea = null;
-	FancySupport.node_chat = null;
-	FancySupport.node_listings = null;
+	_NODE_TEXTAREA = null;
+	_NODE_CHAT = null;
+	_NODE_LISTINGS = null;
 
-	FancySupport.email_md5 = '';
+	_EMAIL_MD5 = '';
+	_CURRENT_VIEW = null;
 
-	FancySupport.user = {}; // user information
-	FancySupport.options = {}; // storing app key etc
-	FancySupport.users = {}; // id/name map for customer and staff
-	FancySupport.active = null;
-	FancySupport.current_view = null;
-	FancySupport.threads = [];
+	_SETTINGS = {};
+	_USER = {};
+	_USERS = {};
+
+	_ACTIVE_THREAD = null;
+	_THREADS = [];
 
 	_APP_NAME = '';
 	_APP_ICON = '';
@@ -71,18 +83,17 @@ function _get_avatar(id) {
 	var d = 'mm';
 
 	// if there's a default image given, or one of gravatars, use that
-	if (FancySupport.options.default_avatar) d = FancySupport.options.default_avatar;
+	if (_SETTINGS.default_avatar) d = _SETTINGS.default_avatar;
 
 	// if there's an id, it's a fancy dude
 	if (id)
 		return _APP_ICON ? 'http://cdn.fancy.support/' + _APP_ICON : 'https://secure.gravatar.com/avatar/?d=' + d;
 
 	// use the avatar they gave us if available
-	if (FancySupport.user.avatar) return FancySupport.user.avatar;
+	if (_USER.avatar) return _USER.avatar;
 
-	return 'https://secure.gravatar.com/avatar/' + FancySupport.email_md5 + '?d=' + d;
+	return 'https://secure.gravatar.com/avatar/' + _EMAIL_MD5 + '?d=' + d;
 }
-
 
 function _timeago(time) {
 	var
@@ -135,9 +146,9 @@ function _ajax(opts, cb) {
 	} else
 		request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 
-	request.setRequestHeader('X-App-Key', FancySupport.options.app_key);
-	request.setRequestHeader('X-Customer-Id', FancySupport.user.customer_id);
-	request.setRequestHeader('X-Signature', FancySupport.options.signature);
+	request.setRequestHeader('X-App-Key', _SETTINGS.app_key);
+	request.setRequestHeader('X-Signature', _SETTINGS.signature);
+	request.setRequestHeader('X-Customer-Id', _USER.customer_id);
 
 	request.onreadystatechange = function () {
 		if (request.readyState === 4 && cb) {
@@ -162,16 +173,16 @@ function _render_widget() {
 		document.body.appendChild(div);
 	}
 
-	div.innerHTML = FancySupport.templates.widget();
+	div.innerHTML = _TEMPLATES.widget();
 
-	FancySupport.node_chat = document.querySelector('#fancy-chat .chat');
-	FancySupport.node_listings = _id('fancy-listings');
+	_NODE_CHAT = document.querySelector('#fancy-chat .chat');
+	_NODE_LISTINGS = _id('fancy-listings');
 }
 
 function _render_header(data) {
 	var div = _id('fancy-header');
 
-	div.innerHTML = FancySupport.templates.header(data);
+	div.innerHTML = _TEMPLATES.header(data);
 
 	var chatsFn = function() { _click_chats(); };
 	var newFn = function() { _render_new_chat(); };
@@ -190,14 +201,13 @@ function _render_new_chat(reply) {
 	if ( ! reply) _render_header({title: 'New Message', which: 'fancy-icon-list'});
 
 	var phrase = reply ? 'Reply to ' : 'Send a message to ';
-	FancySupport.node_chat.innerHTML = FancySupport.templates.chat(phrase + _APP_NAME);
-	_remove_class(FancySupport.node_chat, 'fancy-hide');
+	_NODE_CHAT.innerHTML = _TEMPLATES.chat(phrase + _APP_NAME);
+	_remove_class(_NODE_CHAT, 'fancy-hide');
 
-	FancySupport.node_listings.innerHTML = '';
-	_add_class(FancySupport.node_listings, 'fancy-hide');
+	_NODE_LISTINGS.innerHTML = '';
+	_add_class(_NODE_LISTINGS, 'fancy-hide');
 
-	FancySupport.node_textarea = _id('fancy-textarea');
-	FancySupport.messages = _id('fancy-messages');
+	_NODE_TEXTAREA = _id('fancy-textarea');
 
 	_add_event('click', _id('fancy-send'), function() {
 		_click_send();
@@ -212,7 +222,7 @@ function _render_existing_chat(data) {
 	_render_header({title: _APP_NAME, which: 'fancy-icon-list'});
 
 	// if this thread has unread messages, send a read call
-	if (FancySupport.active.unread) {
+	if (_ACTIVE_THREAD.unread) {
 		_update_read(function() {
 			_update_active();
 			_check_updates();
@@ -221,7 +231,7 @@ function _render_existing_chat(data) {
 
 	var div = _id('fancy-messages');
 
-	div.innerHTML = FancySupport.templates.messages(FancySupport.active);
+	div.innerHTML = _TEMPLATES.messages(_ACTIVE_THREAD);
 	div.scrollTop = div.scrollHeight;
 }
 
@@ -230,21 +240,20 @@ function _render_listings() {
 
 	_render_header({title: _APP_NAME, which: 'fancy-icon-pencil'});
 
-	FancySupport.threads.sort(function(a, b) {
+	_THREADS.sort(function(a, b) {
 		return (! a.unread && b.unread) || a.updated < b.updated;
 	});
 
-	FancySupport.node_listings.innerHTML = FancySupport.templates.listings(FancySupport.threads);
-	_remove_class(FancySupport.node_listings, 'fancy-hide');
+	_NODE_LISTINGS.innerHTML = _TEMPLATES.listings(_THREADS);
+	_remove_class(_NODE_LISTINGS, 'fancy-hide');
 
-	FancySupport.node_chat.innerHTML = '';
-	_add_class(FancySupport.node_chat, 'fancy-hide');
+	_NODE_CHAT.innerHTML = '';
+	_add_class(_NODE_CHAT, 'fancy-hide');
 }
 
 function _remove_widget() {
 	_CURRENT_VIEW = null;
-	FancySupport.messages = null;
-	FancySupport.node_textarea = null;
+	_NODE_TEXTAREA = null;
 
 	var chat = _id('fancy-chat');
 	if (chat) document.body.removeChild(chat);
@@ -271,7 +280,7 @@ function _get_settings() {
 							_APP_NAME = value; break;
 
 						default:
-							FancySupport.users[id] = value;
+							_USERS[id] = value;
 					}
 				}
 			}
@@ -285,7 +294,7 @@ function _get_messages(cb) {
 		url: '/messages'
 	}, function(ok, err) {
 		if (ok) {
-			FancySupport.threads = ok.data;
+			_THREADS = ok.data;
 			_check_updates();
 			if (cb) cb();
 		}
@@ -293,16 +302,16 @@ function _get_messages(cb) {
 }
 
 function _has_unreads() {
-	for (var i=0; i<FancySupport.threads.length; i++) {
-		if (FancySupport.threads[i].unread) return true;
+	for (var i=0; i<_THREADS.length; i++) {
+		if (_THREADS[i].unread) return true;
 	}
 }
 
 function _check_updates() {
 	var updates = 0;
 
-	for (var i=0; i<FancySupport.threads.length; i++) {
-		var thread = FancySupport.threads[i];
+	for (var i=0; i<_THREADS.length; i++) {
+		var thread = _THREADS[i];
 		var last_read = thread.last_read;
 
 		for (var j=0; j<thread.replies.length; j++) {
@@ -317,19 +326,19 @@ function _check_updates() {
 
 	if (updates === 0) updates = '';
 
-	if (FancySupport.options.unread_counter) {
-		var node = document.querySelector(FancySupport.options.unread_counter);
+	if (_SETTINGS.unread_counter) {
+		var node = document.querySelector(_SETTINGS.unread_counter);
 		node.innerHTML = updates;
 	}
 }
 
 function _update_active(cb) {
 	_get_messages(function() {
-		if ( ! FancySupport.active) return;
+		if ( ! _ACTIVE_THREAD) return;
 		// reassign the active conversation
-		for (var i=0; i<FancySupport.threads.length; i++) {
-			if (FancySupport.active.id === FancySupport.threads[i].id) {
-				FancySupport.active = FancySupport.threads[i];
+		for (var i=0; i<_THREADS.length; i++) {
+			if (_ACTIVE_THREAD.id === _THREADS[i].id) {
+				_ACTIVE_THREAD = _THREADS[i];
 			}
 		}
 
@@ -338,19 +347,19 @@ function _update_active(cb) {
 }
 
 function _update_read(cb) {
-	if ( ! FancySupport.active) return;
+	if ( ! _ACTIVE_THREAD) return;
 
 	_ajax({
 		method: 'POST',
-		url: '/messages/' + FancySupport.active.id + '/read'
+		url: '/messages/' + _ACTIVE_THREAD.id + '/read'
 	});
 
 	if (cb) cb();
 }
 
 function _click_send() {
-	var message = FancySupport.node_textarea.value;
-	FancySupport.node_textarea.value = '';
+	var message = _NODE_TEXTAREA.value;
+	_NODE_TEXTAREA.value = '';
 
 	if (message === '') return;
 
@@ -358,10 +367,10 @@ function _click_send() {
 		content: message
 	};
 
-	if (FancySupport.active) { // replying to an existing conversation
+	if (_ACTIVE_THREAD) { // replying to an existing conversation
 		_ajax({
 			method: 'POST',
-			url: '/messages/' + FancySupport.active.id + '/reply',
+			url: '/messages/' + _ACTIVE_THREAD.id + '/reply',
 			data: data,
 			json: true
 		}, function(ok, err) {
@@ -370,7 +379,7 @@ function _click_send() {
 				data.incoming = true;
 				data.created = Math.floor(new Date().getTime()/1000);
 				data.user_id = '';
-				FancySupport.active.replies.push(data);
+				_ACTIVE_THREAD.replies.push(data);
 
 				_CURRENT_VIEW = 'existing';
 				_render_existing_chat();
@@ -382,7 +391,7 @@ function _click_send() {
 		});
 	} else {  // creating a new conversation
 		// sending initial message requests the customer name
-		data.customer_name = FancySupport.user.name;
+		data.customer_name = _USER.name;
 
 		_ajax({
 			method: 'POST',
@@ -392,8 +401,8 @@ function _click_send() {
 		}, function(ok, err) {
 			if (ok) {
 				ok.data.replies = [];
-				FancySupport.active = ok.data;
-				FancySupport.threads.push(FancySupport.active);
+				_ACTIVE_THREAD = ok.data;
+				_THREADS.push(_ACTIVE_THREAD);
 				_CURRENT_VIEW = 'existing';
 				_render_existing_chat();
 			}
@@ -405,11 +414,11 @@ function _click_chats_update() {
 	if (_CURRENT_VIEW !== 'listing') return;
 
 	_render_listings();
-	FancySupport.active = null;
+	_ACTIVE_THREAD = null;
 
 	var fn = function(e) {
 		var id = this.getAttribute("data-id");
-		FancySupport.active = FancySupport.threads[id];
+		_ACTIVE_THREAD = _THREADS[id];
 
 		_CURRENT_VIEW = 'existing';
 		_render_existing_chat();
@@ -438,29 +447,29 @@ var FancySupport = {
 		var that = this;
 
 		if (typeof options !== 'object') {
-			console.error("Fancy needs a config object to run.");
+			console.error("FancySupport needs a config object to run.");
 			return;
 		}
 
 		if ( ! options.signature) {
-			console.error("Fancy needs a customer signature field: signature");
+			console.error("FancySupport needs a customer signature field: signature");
 			return;
 		}
 
 		if ( ! options.app_key) {
-			console.error("Fancy needs an application key field: app_key.");
+			console.error("FancySupport needs an application key field: app_key.");
 			return;
 		}
 
 		if ( ! options.customer_id) {
-			console.error("Fancy needs a customer id field: customer_id.");
+			console.error("FancySupport needs a customer id field: customer_id.");
 			return;
 		}
 
 		// setup initial settings
 		_set_defaults();
 
-		this.options = {
+		_SETTINGS = {
 			app_key: options.app_key,
 			signature: options.signature,
 			default_avatar: options.default_avatar,
@@ -468,18 +477,18 @@ var FancySupport = {
 			unread_counter: options.unread_counter
 		};
 
-		this.user.customer_id = options.customer_id;
+		_USER.customer_id = options.customer_id;
 
-		if (options.name) this.user.name = options.name;
-		if (options.email) this.user.email = options.email;
-		if (options.phone) this.user.phone = options.phone;
-		if (options.avatar) this.user.avatar = options.avatar;
+		if (options.name) _USER.name = options.name;
+		if (options.email) _USER.email = options.email;
+		if (options.phone) _USER.phone = options.phone;
+		if (options.avatar) _USER.avatar = options.avatar;
 
 		if (options.custom_data) {
 			if (typeof options.custom_data === 'object')
-				this.user.custom_data = options.custom_data;
+				_USER.custom_data = options.custom_data;
 			else
-				console.error('Fancy custom_data needs to be an object.');
+				console.error('FancySupport custom_data needs to be an object.');
 		}
 
 		_OLD_ONERROR = window.onerror;
@@ -510,13 +519,13 @@ var FancySupport = {
 		_get_messages();
 
 		// perform this once
-		this.email_md5 = this.md5(this.user.email);
+		_EMAIL_MD5 = _calc_md5(_USER.email);
 
 		// preload avatar
 		var img = new Image();
 		img.src = _get_avatar();
 
-		this.users[''] = this.user.name;
+		_USERS[''] = _USER.name;
 
 		setInterval(function() {
 			_get_messages();
@@ -526,7 +535,7 @@ var FancySupport = {
 		_CLICK_HANDLER = function() {
 			_render_widget();
 
-			if (that.active) {
+			if (_ACTIVE_THREAD) {
 				// get something out quick
 				_CURRENT_VIEW = 'existing';
 				_render_existing_chat();
@@ -546,7 +555,7 @@ var FancySupport = {
 			}
 		};
 
-		_add_event('click', document.querySelector(this.options.activator), _CLICK_HANDLER);
+		_add_event('click', document.querySelector(_SETTINGS.activator), _CLICK_HANDLER);
 
 		String.prototype.encodeHTML = function() {
 			var encodeHTMLRules = { "&": "&#38;", "<": "&#60;", ">": "&#62;", '"': '&#34;', "'": '&#39;', "/": '&#47;' },
@@ -560,10 +569,10 @@ var FancySupport = {
 	impression: function() {
 		var impression = {};
 
-		if (this.user.name) impression.name = this.user.name;
-		if (this.user.email) impression.email = this.user.email;
-		if (this.user.phone) impression.phone = this.user.phone;
-		if (this.user.custom_data) impression.custom_data = this.user.custom_data;
+		if (_USER.name) impression.name = _USER.name;
+		if (_USER.email) impression.email = _USER.email;
+		if (_USER.phone) impression.phone = _USER.phone;
+		if (_USER.custom_data) impression.custom_data = _USER.custom_data;
 		impression.resolution = [window.innerWidth, window.innerHeight];
 
 		_ajax({method: 'POST', url: '/impression', data: impression, json: true});
@@ -590,7 +599,7 @@ var FancySupport = {
 	},
 
 	clear: function() {
-		_remove_event('click', document.querySelector(this.options.activator), _CLICK_HANDLER);
+		_remove_event('click', document.querySelector(_SETTINGS.activator), _CLICK_HANDLER);
 		_set_defaults();
 		_remove_widget();
 		// FIXME put old onerror back

@@ -4,7 +4,7 @@
 			<img class="avatar" src="{{! _get_avatar(param.user_id) }}" />
 		</div>
 		<div class="text">
-			<div class="name">{{= FancySupport.users[param.user_id] }}</div>
+			<div class="name">{{= _USERS[param.user_id] }}</div>
 			<div class="time">{{= _timeago(param.created) }}</div>
 			{{! param.content }}
 		</div>

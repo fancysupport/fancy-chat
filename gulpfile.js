@@ -30,7 +30,7 @@ gulp.task('http', function() {
 
 gulp.task('dot', function() {
 	var options = {
-		dictionary: 'FancySupport["templates"]',
+		dictionary: '_TEMPLATES',
 		varname: 'it'
 	};
 
@@ -44,7 +44,7 @@ gulp.task('dot', function() {
 	return gulp.src('src/views/**/*')
 		.pipe(d)
 		.pipe(concat('templates.js'))
-		.pipe(header('FancySupport.templates = {};\n'))
+		.pipe(header('_TEMPLATES = {};\n'))
 		.pipe(gulp.dest('build'));
 });
 

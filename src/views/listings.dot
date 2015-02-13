@@ -2,7 +2,7 @@
 	<div class="listing {{? v.unread === true }}unread{{?}}" data-id="{{= k }}">
 		<img class="avatar" src="{{! _get_avatar(v.user_id) }}" />
 		<div class="text">
-			<div class="title">{{= FancySupport.users[v.user_id] }}</div>
+			<div class="title">{{= _USERS[v.user_id] }}</div>
 			<div class="content">{{! v.content }}</div>
 			<div class="reply content">{{! (v.replies[v.replies.length-1]||{}).content||'no replies' }}</div>
 			<div class="time">{{= _timeago(v.updated) }}</div>
