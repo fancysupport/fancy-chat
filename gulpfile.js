@@ -10,9 +10,10 @@ var http = require('http');
 var livereload = require('gulp-livereload');
 var ecstatic = require('ecstatic');
 var notifier = require('node-notifier');
+var exec = require('child_process').exec;
 
 var handle_error = function(e) {
-	gutil.log(gutil.colors.red(e.message));
+	gutil.log(gutil.colors.red(e));
 	if (e.fileName) gutil.log(gutil.colors.red(e.fileName));
 
 	var n = new notifier();
@@ -64,20 +65,34 @@ gulp.task('css', function() {
 		.pipe(gulp.dest('build'));
 });
 
-gulp.task('js', function() {
+gulp.task('move-js', function() {
 	return gulp.src('src/js/**/*')
 		.pipe(gulp.dest('build'));
 });
 
-gulp.task('combine', ['js', 'dot', 'css'], function() {
-	return gulp.src('build/*.js')
+gulp.task('combine', ['move-js', 'dot', 'css'], function(cb) {
+	exec('smash build/index.js > build/client.js', function(err) {
+		if (err) handle_error(err);
+		if (cb) cb();
+	});
+});
+
+gulp.task('js', ['combine'], function() {
+	return gulp.src('build/client.js')
 		.pipe(concat('client.js'))
 		.pipe(gulp.dest('dist'));
 });
 
-gulp.task('minify', ['combine'], function() {
+gulp.task('minify', ['js'], function() {
+	var u = uglify()
+		.on('error', function(e) {
+			handle_error(e);
+			u.end();
+			return false;
+		});
+
 	return gulp.src('dist/client.js')
-		.pipe(uglify())
+		.pipe(u)
 		.pipe(concat('client.min.js'))
 		.pipe(gulp.dest('dist'));
 });

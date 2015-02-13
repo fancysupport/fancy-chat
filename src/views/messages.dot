@@ -1,11 +1,11 @@
 {{##def.message:param:
 	<div class="{{? param.incoming === true }}out{{??}}in{{?}} message">
 		<div class="info">
-			<img class="avatar" src="{{! FancySupport.get_avatar(param.user_id) }}" />
+			<img class="avatar" src="{{! _get_avatar(param.user_id) }}" />
 		</div>
 		<div class="text">
 			<div class="name">{{= FancySupport.users[param.user_id] }}</div>
-			<div class="time">{{= FancySupport.timeago(param.created) }}</div>
+			<div class="time">{{= _timeago(param.created) }}</div>
 			{{! param.content }}
 		</div>
 	</div>
