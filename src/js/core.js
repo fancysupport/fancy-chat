@@ -60,41 +60,6 @@ function _remove_event(event, node, fn) {
 		node.detachEvent('on'+event, fn);
 }
 
-function _set_defaults() {
-	_NODE_TEXTAREA = null;
-	_NODE_CHAT = null;
-	_NODE_LISTINGS = null;
-
-	_EMAIL_MD5 = '';
-	_CURRENT_VIEW = null;
-
-	_SETTINGS = {};
-	_USER = {};
-	_USERS = {};
-
-	_ACTIVE_THREAD = null;
-	_THREADS = [];
-
-	_APP_NAME = '';
-	_APP_ICON = '';
-}
-
-function _get_avatar(id) {
-	var d = 'mm';
-
-	// if there's a default image given, or one of gravatars, use that
-	if (_SETTINGS.default_avatar) d = _SETTINGS.default_avatar;
-
-	// if there's an id, it's a fancy dude
-	if (id)
-		return _APP_ICON ? 'http://cdn.fancy.support/' + _APP_ICON : 'https://secure.gravatar.com/avatar/?d=' + d;
-
-	// use the avatar they gave us if available
-	if (_USER.avatar) return _USER.avatar;
-
-	return 'https://secure.gravatar.com/avatar/' + _EMAIL_MD5 + '?d=' + d;
-}
-
 function _timeago(time) {
 	var
 			local  = Math.floor(new Date().getTime()/1000),
@@ -162,6 +127,7 @@ function _ajax(opts, cb) {
 	};
 	request.send(opts.data);
 }
+
 
 function _render_widget() {
 	// append the widget to the end of the body, check to make sure
@@ -257,6 +223,42 @@ function _remove_widget() {
 
 	var chat = _id('fancy-chat');
 	if (chat) document.body.removeChild(chat);
+}
+
+
+function _set_defaults() {
+	_NODE_TEXTAREA = null;
+	_NODE_CHAT = null;
+	_NODE_LISTINGS = null;
+
+	_EMAIL_MD5 = '';
+	_CURRENT_VIEW = null;
+
+	_SETTINGS = {};
+	_USER = {};
+	_USERS = {};
+
+	_ACTIVE_THREAD = null;
+	_THREADS = [];
+
+	_APP_NAME = '';
+	_APP_ICON = '';
+}
+
+function _get_avatar(id) {
+	var d = 'mm';
+
+	// if there's a default image given, or one of gravatars, use that
+	if (_SETTINGS.default_avatar) d = _SETTINGS.default_avatar;
+
+	// if there's an id, it's a fancy dude
+	if (id)
+		return _APP_ICON ? 'http://cdn.fancy.support/' + _APP_ICON : 'https://secure.gravatar.com/avatar/?d=' + d;
+
+	// use the avatar they gave us if available
+	if (_USER.avatar) return _USER.avatar;
+
+	return 'https://secure.gravatar.com/avatar/' + _EMAIL_MD5 + '?d=' + d;
 }
 
 function _get_settings() {
@@ -442,166 +444,170 @@ function _click_chats() {
 	});
 }
 
-var FancySupport = {
-	init: function(options) {
-		var that = this;
 
-		if (typeof options !== 'object') {
-			console.error("FancySupport needs a config object to run.");
-			return;
-		}
-
-		if ( ! options.signature) {
-			console.error("FancySupport needs a customer signature field: signature");
-			return;
-		}
-
-		if ( ! options.app_key) {
-			console.error("FancySupport needs an application key field: app_key.");
-			return;
-		}
-
-		if ( ! options.customer_id) {
-			console.error("FancySupport needs a customer id field: customer_id.");
-			return;
-		}
-
-		// setup initial settings
-		_set_defaults();
-
-		_SETTINGS = {
-			app_key: options.app_key,
-			signature: options.signature,
-			default_avatar: options.default_avatar,
-			activator: options.activator,
-			unread_counter: options.unread_counter
-		};
-
-		_USER.customer_id = options.customer_id;
-
-		if (options.name) _USER.name = options.name;
-		if (options.email) _USER.email = options.email;
-		if (options.phone) _USER.phone = options.phone;
-		if (options.avatar) _USER.avatar = options.avatar;
-
-		if (options.custom_data) {
-			if (typeof options.custom_data === 'object')
-				_USER.custom_data = options.custom_data;
-			else
-				console.error('FancySupport custom_data needs to be an object.');
-		}
-
-		_OLD_ONERROR = window.onerror;
-		var new_onerror = function(error, file, line) {
-			try {
-				var e = {
-					name: 'error',
-				};
-
-				if (error) e.desc = ''+error;
-
-				if (file || line) {
-					e.data = {};
-					if (file) e.data.file = ''+file;
-					if (line) e.data.line = ''+line;
-				}
-
-				that.event(e);
-			} catch(ex) {}
-
-			if (_OLD_ONERROR) _OLD_ONERROR.apply(this, arguments);
-		};
-
-		if (options.log_errors) window.onerror = new_onerror;
-
-		this.impression();
-		_get_settings();
-		_get_messages();
-
-		// perform this once
-		_EMAIL_MD5 = _calc_md5(_USER.email);
-
-		// preload avatar
-		var img = new Image();
-		img.src = _get_avatar();
-
-		_USERS[''] = _USER.name;
-
-		setInterval(function() {
-			_get_messages();
-		}, 10*60*1000);
-
-		// save a reference to this function because we need it for when we unlisten
-		_CLICK_HANDLER = function() {
-			_render_widget();
-
-			if (_ACTIVE_THREAD) {
-				// get something out quick
-				_CURRENT_VIEW = 'existing';
-				_render_existing_chat();
-
-				// get the most recent version of active
-				_update_active(function() {
-					_render_existing_chat();
-				});
-			} else {
-				if (_has_unreads()) {
-					_click_chats();
-				} else {
-					// get new versions on open
-					_render_new_chat();
-					_get_messages();
-				}
-			}
-		};
-
-		_add_event('click', document.querySelector(_SETTINGS.activator), _CLICK_HANDLER);
-
-		String.prototype.encodeHTML = function() {
-			var encodeHTMLRules = { "&": "&#38;", "<": "&#60;", ">": "&#62;", '"': '&#34;', "'": '&#39;', "/": '&#47;' },
-			matchHTML = /&(?!#?\w+;)|<|>|"|'|\//g;
-			return function() {
-				return this ? this.replace(matchHTML, function(m) {return encodeHTMLRules[m] || m;}) : this;
-			};
-		}();
-	},
-
-	impression: function() {
-		var impression = {};
-
-		if (_USER.name) impression.name = _USER.name;
-		if (_USER.email) impression.email = _USER.email;
-		if (_USER.phone) impression.phone = _USER.phone;
-		if (_USER.custom_data) impression.custom_data = _USER.custom_data;
-		impression.resolution = [window.innerWidth, window.innerHeight];
-
-		_ajax({method: 'POST', url: '/impression', data: impression, json: true});
-	},
-
-	event: function(opts, cb) {
-		// nothing or no name, so go home
-		if ( ! opts || ! opts.name) return;
-
-		// set them all to strings since numbers produce errors
-		var event = {
-			name: ''+opts.name
-		};
-
-		if (opts.desc) event.description = ''+opts.desc;
-		if (opts.data) event.custom_data = opts.data;
-
-		_ajax({
-			method: 'POST',
-			url: '/events',
-			data: event,
-			json: true
-		}, cb);
-	},
-
-	clear: function() {
-		_remove_event('click', document.querySelector(_SETTINGS.activator), _CLICK_HANDLER);
-		_set_defaults();
-		_remove_widget();
-		window.onerror = _OLD_ONERROR || function(){};
+function _init(options) {
+	if (typeof options !== 'object') {
+		console.error("FancySupport needs a config object to run.");
+		return;
 	}
+
+	if ( ! options.signature) {
+		console.error("FancySupport needs a customer signature field: signature");
+		return;
+	}
+
+	if ( ! options.app_key) {
+		console.error("FancySupport needs an application key field: app_key.");
+		return;
+	}
+
+	if ( ! options.customer_id) {
+		console.error("FancySupport needs a customer id field: customer_id.");
+		return;
+	}
+
+	// setup initial settings
+	_set_defaults();
+
+	_SETTINGS = {
+		app_key: options.app_key,
+		signature: options.signature,
+		default_avatar: options.default_avatar,
+		activator: options.activator,
+		unread_counter: options.unread_counter
+	};
+
+	_USER.customer_id = options.customer_id;
+
+	if (options.name) _USER.name = options.name;
+	if (options.email) _USER.email = options.email;
+	if (options.phone) _USER.phone = options.phone;
+	if (options.avatar) _USER.avatar = options.avatar;
+
+	if (options.custom_data) {
+		if (typeof options.custom_data === 'object')
+			_USER.custom_data = options.custom_data;
+		else
+			console.error('FancySupport custom_data needs to be an object.');
+	}
+
+	_OLD_ONERROR = window.onerror;
+	var new_onerror = function(error, file, line) {
+		try {
+			var e = {
+				name: 'error',
+			};
+
+			if (error) e.desc = ''+error;
+
+			if (file || line) {
+				e.data = {};
+				if (file) e.data.file = ''+file;
+				if (line) e.data.line = ''+line;
+			}
+
+			_event(e);
+		} catch(ex) {}
+
+		if (_OLD_ONERROR) _OLD_ONERROR.apply(this, arguments);
+	};
+
+	if (options.log_errors) window.onerror = new_onerror;
+
+	_impression();
+	_get_settings();
+	_get_messages();
+
+	// perform this once
+	_EMAIL_MD5 = _calc_md5(_USER.email);
+
+	// preload avatar
+	var img = new Image();
+	img.src = _get_avatar();
+
+	_USERS[''] = _USER.name;
+
+	setInterval(function() {
+		_get_messages();
+	}, 10*60*1000);
+
+	// save a reference to this function because we need it for when we unlisten
+	_CLICK_HANDLER = function() {
+		_render_widget();
+
+		if (_ACTIVE_THREAD) {
+			// get something out quick
+			_CURRENT_VIEW = 'existing';
+			_render_existing_chat();
+
+			// get the most recent version of active
+			_update_active(function() {
+				_render_existing_chat();
+			});
+		} else {
+			if (_has_unreads()) {
+				_click_chats();
+			} else {
+				// get new versions on open
+				_render_new_chat();
+				_get_messages();
+			}
+		}
+	};
+
+	_add_event('click', document.querySelector(_SETTINGS.activator), _CLICK_HANDLER);
+
+	String.prototype.encodeHTML = function() {
+		var encodeHTMLRules = { "&": "&#38;", "<": "&#60;", ">": "&#62;", '"': '&#34;', "'": '&#39;', "/": '&#47;' },
+		matchHTML = /&(?!#?\w+;)|<|>|"|'|\//g;
+		return function() {
+			return this ? this.replace(matchHTML, function(m) {return encodeHTMLRules[m] || m;}) : this;
+		};
+	}();
+}
+
+function _impression() {
+	var impression = {};
+
+	if (_USER.name) impression.name = _USER.name;
+	if (_USER.email) impression.email = _USER.email;
+	if (_USER.phone) impression.phone = _USER.phone;
+	if (_USER.custom_data) impression.custom_data = _USER.custom_data;
+	impression.resolution = [window.innerWidth, window.innerHeight];
+
+	_ajax({method: 'POST', url: '/impression', data: impression, json: true});
+}
+
+function _event(opts, cb) {
+	// nothing or no name, so go home
+	if ( ! opts || ! opts.name) return;
+
+	// set them all to strings since numbers produce errors
+	var event = {
+		name: ''+opts.name
+	};
+
+	if (opts.desc) event.description = ''+opts.desc;
+	if (opts.data) event.custom_data = opts.data;
+
+	_ajax({
+		method: 'POST',
+		url: '/events',
+		data: event,
+		json: true
+	}, cb);
+}
+
+function _clear() {
+	_remove_event('click', document.querySelector(_SETTINGS.activator), _CLICK_HANDLER);
+	_set_defaults();
+	_remove_widget();
+	window.onerror = _OLD_ONERROR || function(){};
+}
+
+var FancySupport = {
+	init: _init,
+	impression: _impression,
+	event: _event,
+	clear: _clear
 };
