@@ -602,6 +602,6 @@ var FancySupport = {
 		_remove_event('click', document.querySelector(_SETTINGS.activator), _CLICK_HANDLER);
 		_set_defaults();
 		_remove_widget();
-		// FIXME put old onerror back
+		window.onerror = _OLD_ONERROR || function(){};
 	}
 };
