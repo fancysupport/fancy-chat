@@ -51,6 +51,7 @@ function _id(id) {
 }
 
 function _add_event(event, node, fn) {
+	if ( ! node) return;
 	if (node.addEventListener)
 		node.addEventListener(event, fn);
 	else if (node.attachEvent)
@@ -58,6 +59,7 @@ function _add_event(event, node, fn) {
 }
 
 function _remove_event(event, node, fn) {
+	if ( ! node) return;
 	if (node.removeEventListener)
 		node.removeEventListener(event, fn);
 	else if (node.detachEvent)
