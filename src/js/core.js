@@ -75,8 +75,7 @@ function _timeago(time) {
 			HOUR   = 3600,
 			DAY    = 86400,
 			WEEK   = 604800,
-			MONTH  = 2629744,
-			YEAR   = 31556926;
+			YEAR   = 31556926,
 			DECADE = 315569260;
 
 		if (offset <= MINUTE)              span = [ '', 'moments' ];
@@ -186,7 +185,7 @@ function _render_new_chat(reply) {
 	});
 }
 
-function _render_existing_chat(data) {
+function _render_existing_chat() {
 	if (_CURRENT_VIEW !== 'existing') return;
 
 	_render_new_chat(true);
@@ -273,7 +272,7 @@ function _get_settings() {
 	_ajax({
 		method: 'GET',
 		url: '/settings'
-	}, function(ok, err) {
+	}, function(ok) {
 		if (ok && ok.data) {
 			for (var id in ok.data) {
 				if (ok.data.hasOwnProperty(id) && ok.data[id] !== undefined) {
@@ -302,7 +301,7 @@ function _get_messages(cb) {
 	_ajax({
 		method: 'GET',
 		url: '/messages'
-	}, function(ok, err) {
+	}, function(ok) {
 		if (ok) {
 			_THREADS = ok.data;
 			_check_updates();
@@ -385,7 +384,7 @@ function _click_send() {
 			url: '/messages/' + _ACTIVE_THREAD.id + '/reply',
 			data: data,
 			json: true
-		}, function(ok, err) {
+		}, function(ok) {
 			if (ok) {
 				// set some things on the data object so ui updates right
 				data.incoming = true;
@@ -410,7 +409,7 @@ function _click_send() {
 			url: '/messages',
 			data: data,
 			json: true
-		}, function(ok, err) {
+		}, function(ok) {
 			if (ok) {
 				ok.data.replies = [];
 				_ACTIVE_THREAD = ok.data;
@@ -428,7 +427,7 @@ function _click_chats_update() {
 	_render_listings();
 	_ACTIVE_THREAD = null;
 
-	var fn = function(e) {
+	var fn = function() {
 		var id = this.getAttribute("data-id");
 		_ACTIVE_THREAD = _THREADS[id];
 
@@ -438,7 +437,6 @@ function _click_chats_update() {
 
 	var convos = document.querySelectorAll('.fancy-listing');
 	for (var i=0; i<convos.length; i++) {
-		var e = convos[i];
 		convos[i].onclick = fn;
 	}
 }
@@ -510,7 +508,7 @@ function _init(options) {
 	var new_onerror = function(error, file, line) {
 		try {
 			var e = {
-				name: 'error',
+				name: 'error'
 			};
 
 			if (error) e.desc = ''+error;

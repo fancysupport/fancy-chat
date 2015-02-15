@@ -45,7 +45,7 @@ gulp.task('dot', function() {
 	return gulp.src('src/views/**/*')
 		.pipe(d)
 		.pipe(concat('templates.js'))
-		.pipe(header('_TEMPLATES = {};\n'))
+		.pipe(header('var _TEMPLATES = {};\n'))
 		.pipe(gulp.dest('build'));
 });
 
