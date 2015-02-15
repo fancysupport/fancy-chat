@@ -31,7 +31,8 @@ gulp.task('http', function() {
 gulp.task('dot', function() {
 	var options = {
 		dictionary: '_TEMPLATES',
-		varname: 'it'
+		varname: 'it',
+		selfcontained: false
 	};
 
 	var d = dot(options)
@@ -49,7 +50,7 @@ gulp.task('dot', function() {
 });
 
 gulp.task('css', function() {
-	var s = stylus({errors: true, compress: false, 'include css': true})
+	var s = stylus({errors: true, compress: true, 'include css': true})
 		.on('error', function(e) {
 			handle_error(e);
 			s.end();
