@@ -1,24 +1,24 @@
 {{##def.listing:
-	<div class="listing {{? v.unread === true }}unread{{?}}" data-id="{{= k }}">
-		<img class="avatar" src="{{! _get_avatar(v.user_id) }}" />
-		<div class="text">
-			<div class="title">{{= _USERS[v.user_id] }}</div>
-			<div class="content">{{! v.content }}</div>
-			<div class="reply content">{{! (v.replies[v.replies.length-1]||{}).content||'no replies' }}</div>
-			<div class="time">{{= _timeago(v.updated) }}</div>
+	<div class="fancy-listing {{? v.unread === true }}fancy-unread{{?}}" data-id="{{= k }}">
+		<img class="fancy-avatar" src="{{! _get_avatar(v.user_id) }}" />
+		<div class="fancy-text">
+			<div class="fancy-title">{{= _USERS[v.user_id] }}</div>
+			<div class="fancy-content">{{! v.content }}</div>
+			<div class="fancy-reply fancy-content">{{! (v.replies[v.replies.length-1]||{}).content||'no replies' }}</div>
+			<div class="fancy-time">{{= _timeago(v.updated) }}</div>
 		</div>
 	</div>
 #}}
 
-<div class="listings">
+<div class="fancy-listings">
 	{{? it.length }}
 		{{~ it :v:k }}
 			{{#def.listing}}
 		{{~}}
 	{{??}}
-		<div class="empty">There are no threads yet.</div>
+		<div class="fancy-empty">There are no threads yet.</div>
 	{{?}}
 </div>
-<div class="powered-by">
+<div class="fancy-powered-by">
 	<a href="http://FancySupport.com">Powered by Fancy Support</a>
 </div>

@@ -147,7 +147,7 @@ function _render_widget() {
 
 	div.innerHTML = _TEMPLATES.widget();
 
-	_NODE_CHAT = document.querySelector('#fancy-chat .chat');
+	_NODE_CHAT = document.querySelector('#fancy-chat .fancy-chat');
 	_NODE_LISTINGS = _id('fancy-listings');
 }
 
@@ -436,7 +436,7 @@ function _click_chats_update() {
 		_render_existing_chat();
 	};
 
-	var convos = document.querySelectorAll('.listing');
+	var convos = document.querySelectorAll('.fancy-listing');
 	for (var i=0; i<convos.length; i++) {
 		var e = convos[i];
 		convos[i].onclick = fn;

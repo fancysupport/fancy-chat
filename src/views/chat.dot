@@ -1,7 +1,7 @@
 <div id="fancy-messages"></div>
 
-<div class="send">
-	<div class="message">
+<div class="fancy-send">
+	<div class="fancy-message">
 		<textarea id="fancy-textarea" placeholder="{{= it}}"></textarea>
 	</div>
 
