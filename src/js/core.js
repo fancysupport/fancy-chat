@@ -15,6 +15,10 @@ var _NODE_TEXTAREA;
 var _NODE_CHAT;
 var _NODE_LISTINGS;
 
+var _INITTED;
+
+// set default empty values onload
+_set_defaults();
 
 function _has_class(node, c) {
 	var classes = node.className.split(' ');
@@ -243,6 +247,8 @@ function _set_defaults() {
 
 	_APP_NAME = '';
 	_APP_ICON = '';
+
+	_INITTED = false;
 }
 
 function _get_avatar(id) {
@@ -468,6 +474,11 @@ function _init(options) {
 		return;
 	}
 
+	// if they're reinitting then clear the previous
+	if (_INITTED) {
+		_clear();
+	}
+
 	// setup initial settings
 	_set_defaults();
 
@@ -566,6 +577,8 @@ function _init(options) {
 			return this ? this.replace(matchHTML, function(m) {return encodeHTMLRules[m] || m;}) : this;
 		};
 	}();
+
+	_INITTED = true;
 }
 
 function _impression() {
@@ -601,10 +614,14 @@ function _event(opts, cb) {
 }
 
 function _clear() {
-	_remove_event('click', document.querySelector(_SETTINGS.activator), _CLICK_HANDLER);
-	_set_defaults();
-	_remove_widget();
-	window.onerror = _OLD_ONERROR || function(){};
+	if (_INITTED) {
+		_remove_event('click', document.querySelector(_SETTINGS.activator), _CLICK_HANDLER);
+		_set_defaults();
+		_remove_widget();
+		window.onerror = _OLD_ONERROR || function(){};
+
+		_INITTED = false;
+	}
 }
 
 var FancySupport = {

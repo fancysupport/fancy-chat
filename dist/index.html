@@ -9,7 +9,7 @@
 	<div style="height:2000px;"></div>
 	<script type="text/javascript" src="/client.js"></script>
 	<script>
-		FancySupport.init({
+		window.opts = {
 			activator: '#fancy',
 			unread_counter: '#unread',
 
@@ -24,7 +24,9 @@
 			},
 
 			log_errors: true
-		});
+		};
+
+		FancySupport.init(opts);
 	</script>
 </body>
 </html>
