@@ -1,6 +1,8 @@
 vendor(prop, args)
 	-webkit-{prop} args
 	-moz-{prop} args
+	-ms-{prop} args
+	-o-{prop} args
 	{prop} args
 
 border-radius()
@@ -182,6 +184,12 @@ mborder(dir)
 			text-decoration none
 			color #7F8C8D
 			font-size 14px
+
+	.empty
+		text-align center
+		padding 20px
+		color #7f8c8d
+		font-size 16px
 
 	.listings
 		height 80%
