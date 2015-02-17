@@ -185,12 +185,15 @@ function _render_new_chat(reply) {
 	});
 }
 
-function _render_existing_chat() {
+function _render_existing_chat(partial) {
 	if (_CURRENT_VIEW !== 'existing') return;
 
-	_render_new_chat(true);
-
-	_render_header({title: _APP_NAME, which: 'fancy-icon-list'});
+	// skip rendering parts of the ui if they aren't changing
+	// stops textarea being cleared after a reply
+	if ( ! partial) {
+		_render_new_chat(true);
+		_render_header({title: _APP_NAME, which: 'fancy-icon-list'});
+	}
 
 	// if this thread has unread messages, send a read call
 	if (_ACTIVE_THREAD.unread) {
@@ -393,10 +396,10 @@ function _click_send() {
 				_ACTIVE_THREAD.replies.push(data);
 
 				_CURRENT_VIEW = 'existing';
-				_render_existing_chat();
+				_render_existing_chat(true);
 
 				_update_active(function() {
-					_render_existing_chat();
+					_render_existing_chat(true);
 				});
 			}
 		});
