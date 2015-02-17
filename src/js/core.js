@@ -401,9 +401,6 @@ function _click_send() {
 			}
 		});
 	} else {  // creating a new conversation
-		// sending initial message requests the customer name
-		data.customer_name = _USER.name;
-
 		_ajax({
 			method: 'POST',
 			url: '/messages',
