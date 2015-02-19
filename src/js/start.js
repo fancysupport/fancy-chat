@@ -2,7 +2,7 @@
 	if (typeof define === 'function' && define.amd) {
 		define(factory);
 	} else if (typeof exports === 'object') {
-		module.exports = factory;
+		module.exports = factory(root);
 	} else {
 		root.FancySupport = factory(root);
 	}
