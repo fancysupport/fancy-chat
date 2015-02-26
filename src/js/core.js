@@ -198,8 +198,9 @@ function _render_existing_chat(partial) {
 	// if this thread has unread messages, send a read call
 	if (_ACTIVE_THREAD.unread) {
 		_update_read(function() {
-			_update_active();
-			_check_updates();
+			_update_active(function() {
+				_check_updates();
+			});
 		});
 	}
 
@@ -326,6 +327,11 @@ function _check_updates() {
 		var thread = _THREADS[i];
 		var last_read = thread.last_read;
 
+		if (last_read < thread.created) {
+			updates++;
+			thread.unread = true;
+		}
+
 		for (var j=0; j<thread.replies.length; j++) {
 			var reply = thread.replies[j];
 
@@ -366,9 +372,9 @@ function _update_read(cb) {
 	_ajax({
 		method: 'POST',
 		url: '/messages/' + _ACTIVE_THREAD.id + '/read'
+	}, function() {
+		if (cb) cb();
 	});
-
-	if (cb) cb();
 }
 
 function _click_send() {
