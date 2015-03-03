@@ -16,6 +16,7 @@ var _NODE_CHAT;
 var _NODE_LISTINGS;
 
 var _INITTED;
+var _FETCH_INTERVAL;
 
 // set default empty values onload
 _set_defaults();
@@ -254,6 +255,9 @@ function _set_defaults() {
 	_APP_ICON = '';
 
 	_INITTED = false;
+
+	if (_FETCH_INTERVAL) clearInterval(_FETCH_INTERVAL);
+	_FETCH_INTERVAL = null;
 }
 
 function _get_avatar(id) {
@@ -348,7 +352,7 @@ function _check_updates() {
 
 	if (_SETTINGS.unread_counter) {
 		var node = document.querySelector(_SETTINGS.unread_counter);
-		node.innerHTML = updates;
+		if (node) node.innerHTML = updates;
 	}
 }
 
@@ -546,7 +550,7 @@ function _init(options) {
 
 	_USERS[''] = _USER.name;
 
-	setInterval(function() {
+	_FETCH_INTERVAL = setInterval(function() {
 		_get_messages();
 	}, 10*60*1000);
 
