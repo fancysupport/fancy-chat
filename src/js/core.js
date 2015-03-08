@@ -1,6 +1,6 @@
 var _CLICK_HANDLER; // activator click function
 var _OLD_ONERROR; // previous value of window.onerror
-var _URL = 'http://api.fancysupport.com:4000/client';
+var _URL = 'https://api.fancysupport.com' + (window.location.hostname === 'local.fancysupport.com' ? ':4000' : '') + '/client';
 var _APP_NAME;
 var _APP_ICON;
 var _EMAIL_MD5;
