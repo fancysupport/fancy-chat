@@ -268,7 +268,7 @@ function _get_avatar(id) {
 
 	// if there's an id, it's a fancy dude
 	if (id)
-		return _APP_ICON ? 'http://cdn.fancy.support/' + _APP_ICON : 'https://secure.gravatar.com/avatar/?d=' + d;
+		return _APP_ICON ? '//cdn.fancy.support/' + _APP_ICON : 'https://secure.gravatar.com/avatar/?d=' + d;
 
 	// use the avatar they gave us if available
 	if (_USER.avatar) return _USER.avatar;
