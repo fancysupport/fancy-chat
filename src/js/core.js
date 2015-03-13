@@ -107,8 +107,8 @@ function _ajax(opts, cb) {
 
 	if (opts.method === 'GET') opts.url += '?bust=' + (new Date()).getTime();
 
-	var XHR = XMLHttpRequest || ActiveXObject;
-	var request = new XHR('MSXML2.XMLHTTP.3.0');
+	var XHR = XMLHttpRequest;
+	var request = new XHR();
 	request.open(opts.method, _URL+opts.url, true);
 
 	if (opts.json) {
