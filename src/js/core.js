@@ -216,11 +216,16 @@ function _render_listings() {
 
 	_render_header({title: _APP_NAME, which: 'fancy-icon-pencil'});
 
-	_THREADS.sort(function(a, b) {
-		return (! a.unread && b.unread) || a.updated < b.updated;
+	var s = _THREADS.sort(function(a, b) {
+		if (a.unread !== b.unread) return a.unread ? -1 : 1;
+		return a.updated > b.updated ? -1 : 1;
 	});
 
-	_NODE_LISTINGS.innerHTML = _TEMPLATES.listings(_THREADS);
+	s.forEach(function(t) {
+		console.log(t.content, t.unread, _timeago(t.updated));
+	});
+
+	_NODE_LISTINGS.innerHTML = _TEMPLATES.listings(s);
 	_remove_class(_NODE_LISTINGS, 'fancy-hide');
 
 	_NODE_CHAT.innerHTML = '';
