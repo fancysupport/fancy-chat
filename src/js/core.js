@@ -221,10 +221,6 @@ function _render_listings() {
 		return a.updated > b.updated ? -1 : 1;
 	});
 
-	s.forEach(function(t) {
-		console.log(t.content, t.unread, _timeago(t.updated));
-	});
-
 	_NODE_LISTINGS.innerHTML = _TEMPLATES.listings(s);
 	_remove_class(_NODE_LISTINGS, 'fancy-hide');
 
