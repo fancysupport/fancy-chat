@@ -281,7 +281,7 @@ function _get_settings() {
 	_ajax({
 		method: 'GET',
 		url: '/settings'
-	}, function(ok) {
+	}, function(ok, err) {
 		if (ok && ok.data) {
 			for (var id in ok.data) {
 				if (ok.data.hasOwnProperty(id) && ok.data[id] !== undefined) {
@@ -302,6 +302,11 @@ function _get_settings() {
 					}
 				}
 			}
+		}
+
+		if (err && err.code == 401) {
+			console.warn('FancySupport client got a 401 error and is shutting down, double check your signature and app key.');
+			_clear();
 		}
 	});
 }
