@@ -3,7 +3,7 @@ var _OLD_ONERROR; // previous value of window.onerror
 var _URL_HOST = 'https://api.fancysupport.com';
 var _URL_PORT = '';
 if (window.location.hostname === 'local.fancysupport.com') {
-	_URL_HOST = 'http://apilocal.fancysupport.com';
+	_URL_HOST = window.location.protocol+'//local.fancysupport.com';
 	_URL_PORT = ':4000';
 }
 var _URL = _URL_HOST + _URL_PORT + '/client';
