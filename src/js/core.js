@@ -283,7 +283,7 @@ function _get_avatar(id) {
 	return 'https://secure.gravatar.com/avatar/' + _EMAIL_MD5 + '?d=' + d;
 }
 
-function _get_settings() {
+function _get_settings(cb) {
 	_ajax({
 		method: 'GET',
 		url: '/settings'
@@ -308,10 +308,16 @@ function _get_settings() {
 					}
 				}
 			}
+
+			if (cb) cb();
 		}
 
-		if (err && err.code == 401) {
-			console.warn('FancySupport client got a 401 error and is shutting down, double check your signature and app key.');
+		if (err) {
+			if (err.code === 401)
+				console.warn('FancySupport client got a 401 error and is shutting down, double check your signature and app key.');
+			else
+				console.warn('FancySupport client got a ' + err.code + ' error and is shutting down.');
+
 			_clear();
 		}
 	});
@@ -474,6 +480,56 @@ function _click_chats() {
 	});
 }
 
+function _finish_init() {
+	// perform this once
+	_EMAIL_MD5 = _calc_md5(_USER.email);
+
+	// preload avatar
+	var img = new Image();
+	img.src = _get_avatar();
+
+	_USERS[''] = _USER.name;
+
+	_FETCH_INTERVAL = setInterval(function() {
+		_get_messages();
+	}, 10*60*1000);
+
+	// save a reference to this function because we need it for when we unlisten
+	_CLICK_HANDLER = function() {
+		_render_widget();
+
+		if (_ACTIVE_THREAD) {
+			// get something out quick
+			_CURRENT_VIEW = 'existing';
+			_render_existing_chat();
+
+			// get the most recent version of active
+			_update_active(function() {
+				_render_existing_chat();
+			});
+		} else {
+			if (_has_unreads()) {
+				_click_chats();
+			} else {
+				// get new versions on open
+				_render_new_chat();
+				_get_messages();
+			}
+		}
+	};
+
+	_add_event('click', document.querySelector(_SETTINGS.activator), _CLICK_HANDLER);
+
+	String.prototype.encodeHTML = function() {
+		var encodeHTMLRules = { "&": "&#38;", "<": "&#60;", ">": "&#62;", '"': '&#34;', "'": '&#39;', "/": '&#47;' },
+		matchHTML = /&(?!#?\w+;)|<|>|"|'|\//g;
+		return function() {
+			return this ? this.replace(matchHTML, function(m) {return encodeHTMLRules[m] || m;}) : this;
+		};
+	}();
+
+	_INITTED = true;
+}
 
 function _init(options) {
 	if (typeof options !== 'object') {
@@ -550,57 +606,8 @@ function _init(options) {
 	if (options.log_errors) window.onerror = new_onerror;
 
 	_impression();
-	_get_settings();
+	_get_settings(_finish_init);
 	_get_messages();
-
-	// perform this once
-	_EMAIL_MD5 = _calc_md5(_USER.email);
-
-	// preload avatar
-	var img = new Image();
-	img.src = _get_avatar();
-
-	_USERS[''] = _USER.name;
-
-	_FETCH_INTERVAL = setInterval(function() {
-		_get_messages();
-	}, 10*60*1000);
-
-	// save a reference to this function because we need it for when we unlisten
-	_CLICK_HANDLER = function() {
-		_render_widget();
-
-		if (_ACTIVE_THREAD) {
-			// get something out quick
-			_CURRENT_VIEW = 'existing';
-			_render_existing_chat();
-
-			// get the most recent version of active
-			_update_active(function() {
-				_render_existing_chat();
-			});
-		} else {
-			if (_has_unreads()) {
-				_click_chats();
-			} else {
-				// get new versions on open
-				_render_new_chat();
-				_get_messages();
-			}
-		}
-	};
-
-	_add_event('click', document.querySelector(_SETTINGS.activator), _CLICK_HANDLER);
-
-	String.prototype.encodeHTML = function() {
-		var encodeHTMLRules = { "&": "&#38;", "<": "&#60;", ">": "&#62;", '"': '&#34;', "'": '&#39;', "/": '&#47;' },
-		matchHTML = /&(?!#?\w+;)|<|>|"|'|\//g;
-		return function() {
-			return this ? this.replace(matchHTML, function(m) {return encodeHTMLRules[m] || m;}) : this;
-		};
-	}();
-
-	_INITTED = true;
 }
 
 function _impression() {
