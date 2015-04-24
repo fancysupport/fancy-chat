@@ -27,6 +27,31 @@ var _FETCH_INTERVAL;
 // set default empty values onload
 _set_defaults();
 
+function _CLICK_HANDLER() {
+	if ( ! _INITTED) return;
+
+	_render_widget();
+
+	if (_ACTIVE_THREAD) {
+		// get something out quick
+		_CURRENT_VIEW = 'existing';
+		_render_existing_chat();
+
+		// get the most recent version of active
+		_update_active(function() {
+			_render_existing_chat();
+		});
+	} else {
+		if (_has_unreads()) {
+			_click_chats();
+		} else {
+			// get new versions on open
+			_render_new_chat();
+			_get_messages();
+		}
+	}
+}
+
 function _has_class(node, c) {
 	var classes = node.className.split(' ');
 	return -1 < _index_of(classes, c);
@@ -494,31 +519,7 @@ function _finish_init() {
 		_get_messages();
 	}, 10*60*1000);
 
-	// save a reference to this function because we need it for when we unlisten
-	_CLICK_HANDLER = function() {
-		_render_widget();
-
-		if (_ACTIVE_THREAD) {
-			// get something out quick
-			_CURRENT_VIEW = 'existing';
-			_render_existing_chat();
-
-			// get the most recent version of active
-			_update_active(function() {
-				_render_existing_chat();
-			});
-		} else {
-			if (_has_unreads()) {
-				_click_chats();
-			} else {
-				// get new versions on open
-				_render_new_chat();
-				_get_messages();
-			}
-		}
-	};
-
-	_add_event('click', document.querySelector(_SETTINGS.activator), _CLICK_HANDLER);
+	_attach();
 
 	String.prototype.encodeHTML = function() {
 		var encodeHTMLRules = { "&": "&#38;", "<": "&#60;", ">": "&#62;", '"': '&#34;', "'": '&#39;', "/": '&#47;' },
@@ -653,9 +654,16 @@ function _clear() {
 	}
 }
 
+function _attach(selector) {
+	selector = selector || _SETTINGS.activator;
+
+	_add_event('click', document.querySelector(selector), _CLICK_HANDLER);
+}
+
 var FancySupport = {
 	init: _init,
 	impression: _impression,
 	event: _event,
-	clear: _clear
+	clear: _clear,
+	attach: _attach
 };
