@@ -625,7 +625,7 @@ function _impression() {
 
 function _event(opts, cb) {
 	// nothing or no name, so go home
-	if ( ! opts || ! opts.name) return;
+	if ( ! opts || ! opts.name) return console.error('FancySupport.event() needs an object with a name field at minimum.');
 
 	// set them all to strings since numbers produce errors
 	var event = {
