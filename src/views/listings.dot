@@ -2,7 +2,7 @@
 	<div class="fancy-listing {{? v.unread === true }}fancy-unread{{?}}" data-id="{{= k }}">
 		<img class="fancy-avatar" src="{{! _get_avatar(v.user_id) }}" />
 		<div class="fancy-text">
-			<div class="fancy-title">{{= _USERS[v.user_id] }}</div>
+			<div class="fancy-title">{{= _USERS[v.user_id] || _APP_NAME }}</div>
 			<div class="fancy-content">{{! v.content }}</div>
 			<div class="fancy-reply fancy-content">{{! (v.replies[v.replies.length-1]||{}).content||'no replies' }}</div>
 			<div class="fancy-time">{{= _timeago(v.updated) }}</div>
