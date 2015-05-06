@@ -17,14 +17,13 @@ box-sizing()
 mborder(dir)
 	border-{dir} 1px solid #7F8C8D
 
-
 @font-face {
 	font-family: 'fancy';
-	src:url('//cdn.fancy.support/fonts/fancy.eot?wypba3');
-	src:url('//cdn.fancy.support/fonts/fancy.eot?#iefixwypba3') format('embedded-opentype'),
-		url('//cdn.fancy.support/fonts/fancy.woff?wypba3') format('woff'),
-		url('//cdn.fancy.support/fonts/fancy.ttf?wypba3') format('truetype'),
-		url('//cdn.fancy.support/fonts/fancy.svg?wypba3#fancy') format('svg');
+	src:url('//cdn.fancy.support/fonts/fancy.eot?-9bi1ry');
+	src:url('//cdn.fancy.support/fonts/fancy.eot?#iefix-9bi1ry') format('embedded-opentype'),
+		url('//cdn.fancy.support/fonts/fancy.woff?-9bi1ry') format('woff'),
+		url('//cdn.fancy.support/fonts/fancy.ttf?-9bi1ry') format('truetype'),
+		url('//cdn.fancy.support/fonts/fancy.svg?-9bi1ry#fancy') format('svg');
 	font-weight: normal;
 	font-style: normal;
 }
@@ -49,12 +48,48 @@ mborder(dir)
 .fancy-icon-pencil:before {
 	content: "\e600";
 }
+
+.fancy-icon-lifebuoy:before {
+	content: "\e603";
+}
+
 .fancy-icon-cross:before {
 	content: "\e601";
 }
+
 .fancy-icon-list:before {
 	content: "\e602";
 }
+
+#fancy-activator
+	position fixed
+	right 20px
+	bottom 20px
+
+	width 35px
+	height 35px
+
+	background-color #c0392b
+	font-size 0
+	padding 5px
+	color #fff
+	border-radius 5px
+	text-align center
+	cursor pointer
+
+	z-index 99998
+
+	#fancy-unread-counter
+		font normal normal normal 30px/35px sans-serif
+
+		&:empty
+			font normal normal normal 32px/35px 'fancy'
+			text-rendering auto
+			-webkit-font-smoothing antialiased
+			-moz-osx-font-smoothing grayscale
+
+			&:before
+				content "\e603"
 
 #fancy-chat
 	position fixed

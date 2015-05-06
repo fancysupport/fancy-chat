@@ -259,6 +259,17 @@ function _render_listings() {
 	_add_class(_NODE_CHAT, 'fancy-hide');
 }
 
+function _render_default_activator() {
+	// render the activator if it isn't already there
+	var div = _id('fancy-activator');
+	if ( ! div) {
+		div = document.createElement('div');
+		div.id = 'fancy-activator';
+		document.body.appendChild(div);
+		div.innerHTML = _TEMPLATES.activator();
+	}
+}
+
 function _remove_widget() {
 	_CURRENT_VIEW = null;
 	_NODE_TEXTAREA = null;
@@ -530,6 +541,9 @@ function _finish_init() {
 	}();
 
 	_INITTED = true;
+
+	_impression();
+	_get_messages();
 }
 
 function _init(options) {
@@ -566,7 +580,7 @@ function _init(options) {
 		signature: options.signature,
 		default_avatar: options.default_avatar,
 		activator: options.activator,
-		unread_counter: options.unread_counter
+		unread_counter: options.unread_counter || '#fancy-unread-counter'
 	};
 
 	_USER.customer_id = options.customer_id;
@@ -606,9 +620,7 @@ function _init(options) {
 
 	if (options.log_errors) window.onerror = new_onerror;
 
-	_impression();
 	_get_settings(_finish_init);
-	_get_messages();
 }
 
 function _impression() {
@@ -656,6 +668,15 @@ function _clear() {
 
 function _attach(selector) {
 	selector = selector || _SETTINGS.activator;
+
+	// chat functionality is disabled
+	if (selector === false) return;
+
+	// using default activator
+	if (selector === true || selector === undefined) {
+		selector = '#fancy-activator';
+		_render_default_activator();
+	}
 
 	_add_event('click', document.querySelector(selector), _CLICK_HANDLER);
 }
