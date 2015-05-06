@@ -540,6 +540,29 @@ function _finish_init() {
 		};
 	}();
 
+	_OLD_ONERROR = window.onerror;
+	var new_onerror = function(error, file, line) {
+		try {
+			var e = {
+				name: 'error'
+			};
+
+			if (error) e.desc = ''+error;
+
+			if (file || line) {
+				e.data = {};
+				if (file) e.data.file = ''+file;
+				if (line) e.data.line = ''+line;
+			}
+
+			_event(e);
+		} catch(ex) {}
+
+		if (_OLD_ONERROR) _OLD_ONERROR.apply(this, arguments);
+	};
+
+	if (_SETTINGS.log_errors) window.onerror = new_onerror;
+
 	_INITTED = true;
 
 	_impression();
@@ -580,7 +603,8 @@ function _init(options) {
 		signature: options.signature,
 		default_avatar: options.default_avatar,
 		activator: options.activator,
-		unread_counter: options.unread_counter || '#fancy-unread-counter'
+		unread_counter: options.unread_counter || '#fancy-unread-counter',
+		log_errors: options.log_errors
 	};
 
 	_USER.customer_id = options.customer_id;
@@ -596,29 +620,6 @@ function _init(options) {
 		else
 			console.error('FancySupport custom_data needs to be an object.');
 	}
-
-	_OLD_ONERROR = window.onerror;
-	var new_onerror = function(error, file, line) {
-		try {
-			var e = {
-				name: 'error'
-			};
-
-			if (error) e.desc = ''+error;
-
-			if (file || line) {
-				e.data = {};
-				if (file) e.data.file = ''+file;
-				if (line) e.data.line = ''+line;
-			}
-
-			_event(e);
-		} catch(ex) {}
-
-		if (_OLD_ONERROR) _OLD_ONERROR.apply(this, arguments);
-	};
-
-	if (options.log_errors) window.onerror = new_onerror;
 
 	_get_settings(_finish_init);
 }
