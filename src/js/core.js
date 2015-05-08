@@ -677,6 +677,12 @@ function _event(opts, cb) {
 function _clear() {
 	if (_INITTED) {
 		_remove_activator();
+
+		if (_SETTINGS.unread_counter) {
+			var node = document.querySelector(_SETTINGS.unread_counter);
+			if (node) node.innerHTML = '';
+		}
+
 		_set_defaults();
 		_remove_widget();
 		window.onerror = _OLD_ONERROR || function(){};
