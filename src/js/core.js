@@ -278,6 +278,24 @@ function _remove_widget() {
 	if (chat) document.body.removeChild(chat);
 }
 
+function _remove_activator() {
+	var selector = _SETTINGS.activator;
+
+	// chat functionality is disabled
+	if (selector === false) return;
+
+	// using default activator
+	if (selector === true || selector === undefined) {
+		selector = '#fancy-activator';
+
+		var activator = _id('fancy-activator');
+		if (activator) document.body.removeChild(activator);
+		return;
+	}
+
+	// just remove the click event from their activator
+	_remove_event('click', document.querySelector(selector), _CLICK_HANDLER);
+}
 
 function _set_defaults() {
 	_NODE_TEXTAREA = null;
@@ -658,7 +676,7 @@ function _event(opts, cb) {
 
 function _clear() {
 	if (_INITTED) {
-		_remove_event('click', document.querySelector(_SETTINGS.activator), _CLICK_HANDLER);
+		_remove_activator();
 		_set_defaults();
 		_remove_widget();
 		window.onerror = _OLD_ONERROR || function(){};
@@ -669,6 +687,9 @@ function _clear() {
 
 function _attach(selector) {
 	selector = selector || _SETTINGS.activator;
+
+	// update _SETTINGS with possible new value
+	_SETTINGS.activator = selector;
 
 	// chat functionality is disabled
 	if (selector === false) return;
