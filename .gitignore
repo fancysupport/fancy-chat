@@ -9,9 +9,7 @@ node_modules/
 build/*
 
 siggen.js
+codes.json
 
 dist/client.js
 dist/client.min.js
-
-src/js/fancycss.js
-src/js/templates.js
