@@ -44,7 +44,7 @@ gulp.task('dot', function() {
 
 	return gulp.src('src/views/**/*')
 		.pipe(d)
-		.pipe(concat('templates.js'))
+		.pipe(concat('../build/templates.js'))
 		.pipe(header('var _TEMPLATES = {};\n'))
 		.pipe(gulp.dest('build'));
 });
@@ -59,7 +59,7 @@ gulp.task('css', function() {
 
 	return gulp.src('src/css/base.styl')
 		.pipe(s)
-		.pipe(concat('fancycss.css'))
+		.pipe(concat('../build/fancycss.css'))
 		.pipe(css2js({
 			splitOnNewLine: true
 		}))
@@ -104,7 +104,7 @@ gulp.task('watch', function() {
 	gulp.watch(['src/js/**/*','src/views/**/*','src/css/**/*'], ['minify']);
 
 	gulp.watch('dist/client.js').on('change', function(f) {
-		livereload().changed(f.path);
+		livereload.changed(f.path);
 	});
 });
 
