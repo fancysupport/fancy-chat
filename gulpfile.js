@@ -78,13 +78,13 @@ gulp.task('combine', ['move-js', 'dot', 'css'], function(cb) {
 	});
 });
 
-gulp.task('js', ['combine'], function() {
+gulp.task('build', ['combine'], function() {
 	return gulp.src('build/client.js')
 		.pipe(concat('client.js'))
 		.pipe(gulp.dest('dist'));
 });
 
-gulp.task('minify', ['js'], function() {
+gulp.task('minify', ['build'], function() {
 	var u = uglify()
 		.on('error', function(e) {
 			handle_error(e);
@@ -108,4 +108,4 @@ gulp.task('watch', function() {
 	});
 });
 
-gulp.task('default', ['http', 'minify', 'watch']);
+gulp.task('default', ['http', 'build', 'watch']);
