@@ -1,5 +1,5 @@
 // https://github.com/jbt/js-crypto/blob/master/md5.js
-var _calc_md5 = function(){
+var md5 = function(){
 
 	var k = [], i = 0;
 

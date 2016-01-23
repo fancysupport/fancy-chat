@@ -66,12 +66,12 @@ gulp.task('css', function() {
 		.pipe(gulp.dest('build'));
 });
 
-gulp.task('move-js', function() {
+gulp.task('copy-js', function() {
 	return gulp.src('src/js/**/*')
 		.pipe(gulp.dest('build'));
 });
 
-gulp.task('combine', ['move-js', 'dot', 'css'], function(cb) {
+gulp.task('combine', ['copy-js', 'dot', 'css'], function(cb) {
 	exec('smash build/index.js > build/client.js', function(err) {
 		if (err) handle_error(err);
 		if (cb) cb();
@@ -95,17 +95,13 @@ gulp.task('minify', ['build'], function() {
 	return gulp.src('dist/client.js')
 		.pipe(u)
 		.pipe(concat('client.min.js'))
-		.pipe(gulp.dest('dist'));
+		.pipe(gulp.dest('dist'))
+		.pipe(livereload());
 });
 
 gulp.task('watch', function() {
 	livereload.listen();
-
-	gulp.watch(['src/js/**/*','src/views/**/*','src/css/**/*'], ['minify']);
-
-	gulp.watch('dist/client.js').on('change', function(f) {
-		livereload.changed(f.path);
-	});
+	gulp.watch(['src/**/*'], ['minify']);
 });
 
-gulp.task('default', ['http', 'build', 'watch']);
+gulp.task('default', ['http', 'minify', 'watch']);

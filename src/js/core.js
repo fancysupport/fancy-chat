@@ -52,124 +52,10 @@ function _CLICK_HANDLER() {
 	}
 }
 
-function _has_class(node, c) {
-	var classes = node.className.split(' ');
-	return -1 < _index_of(classes, c);
-}
-
-function _add_class(node, c) {
-	if (node && ! _has_class(node, c))
-		node.className += ' ' + c;
-}
-
-function _remove_class(node, c) {
-	if (node && _has_class(node, c)) {
-		var classes = node.className.split(' ');
-		classes.splice(_index_of(classes, c), 1);
-		node.className = classes.join(' ');
-	}
-}
-
-function _index_of(arr, e) {
-	for (var i=0; i<arr.length; i++) {
-		if (arr[i] === e) return i;
-	}
-
-	return -1;
-}
-
-function _id(id) {
-	return document.getElementById(id);
-}
-
-function _add_event(event, node, fn) {
-	if ( ! node) return;
-	if (node.addEventListener)
-		node.addEventListener(event, fn);
-	else if (node.attachEvent)
-		node.attachEvent('on'+event, fn);
-}
-
-function _remove_event(event, node, fn) {
-	if ( ! node) return;
-	if (node.removeEventListener)
-		node.removeEventListener(event, fn);
-	else if (node.detachEvent)
-		node.detachEvent('on'+event, fn);
-}
-
-function _timeago(time) {
-	var
-			local  = Math.floor(new Date().getTime()/1000),
-			offset = Math.abs((local - time)),
-			span   = [],
-			MINUTE = 60,
-			HOUR   = 3600,
-			DAY    = 86400,
-			WEEK   = 604800,
-			YEAR   = 31556926,
-			DECADE = 315569260;
-
-		if (offset <= MINUTE)              span = [ '', 'moments' ];
-		else if (offset < (MINUTE * 60))   span = [ Math.round(Math.abs(offset / MINUTE)), 'min' ];
-		else if (offset < (HOUR * 24))     span = [ Math.round(Math.abs(offset / HOUR)), 'hour' ];
-		else if (offset < (DAY * 7))       span = [ Math.round(Math.abs(offset / DAY)), 'day' ];
-		else if (offset < (WEEK * 52))     span = [ Math.round(Math.abs(offset / WEEK)), 'week' ];
-		else if (offset < (YEAR * 10))     span = [ Math.round(Math.abs(offset / YEAR)), 'year' ];
-		else if (offset < (DECADE * 100))  span = [ Math.round(Math.abs(offset / DECADE)), 'decade' ];
-		else                               span = [ '', 'a long time' ];
-
-		span[1] += (span[0] === 0 || span[0] > 1) ? 's' : '';
-		span = span.join(' ');
-
-		return span + ' ago';
-}
-
-function _ajax(opts, cb) {
-	var parse = function (req) {
-		var result;
-		try {
-			result = JSON.parse(req.responseText);
-		} catch (e) {
-			result = req.responseText;
-		}
-		return {code: req.status, data: result};
-	};
-
-	if (opts.method === 'GET') opts.url += '?bust=' + (new Date()).getTime();
-
-	var XHR = XMLHttpRequest;
-	var request = new XHR();
-	request.open(opts.method, _URL+opts.url, true);
-
-	if (opts.json) {
-		request.setRequestHeader('Content-type', 'application/json');
-		opts.data = JSON.stringify(opts.data);
-	} else
-		request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-
-	request.setRequestHeader('X-App-Key', _SETTINGS.app_key);
-	request.setRequestHeader('X-Signature', _SETTINGS.signature);
-	request.setRequestHeader('X-Customer-Id', _USER.customer_id);
-
-	request.onreadystatechange = function () {
-		if (request.readyState === 4 && cb) {
-			var obj = parse(request);
-			if (request.status >= 200 && request.status < 300) {
-				cb(obj);
-			} else {
-				cb(null, obj.error || obj);
-			}
-		}
-	};
-	request.send(opts.data);
-}
-
-
 function _render_widget() {
 	// append the widget to the end of the body, check to make sure
 	// it hasn't already been created, if it has, recreate
-	var div = _id('fancy-chat');
+	var div = dom_id('fancy-chat');
 	if ( ! div) {
 		div = document.createElement('div');
 		div.id = 'fancy-chat';
@@ -179,20 +65,20 @@ function _render_widget() {
 	div.innerHTML = _TEMPLATES.widget();
 
 	_NODE_CHAT = document.querySelector('#fancy-chat .fancy-chat');
-	_NODE_LISTINGS = _id('fancy-listings');
+	_NODE_LISTINGS = dom_id('fancy-listings');
 }
 
 function _render_header(data) {
-	var div = _id('fancy-header');
+	var div = dom_id('fancy-header');
 
 	div.innerHTML = _TEMPLATES.header(data);
 
 	var chatsFn = function() { _click_chats(); };
 	var newFn = function() { _render_new_chat(); };
 
-	_add_event('click', _id('fancy-newchats'), data.which == 'fancy-icon-pencil' ? newFn : chatsFn);
+	add_event('click', dom_id('fancy-newchats'), data.which == 'fancy-icon-pencil' ? newFn : chatsFn);
 
-	_add_event('click', _id('fancy-close'), function() {
+	add_event('click', dom_id('fancy-close'), function() {
 		_remove_widget();
 	});
 }
@@ -205,14 +91,14 @@ function _render_new_chat(reply) {
 
 	var phrase = reply ? 'Reply to ' : 'Send a message to ';
 	_NODE_CHAT.innerHTML = _TEMPLATES.chat(phrase + _APP_NAME);
-	_remove_class(_NODE_CHAT, 'fancy-hide');
+	remove_class(_NODE_CHAT, 'fancy-hide');
 
 	_NODE_LISTINGS.innerHTML = '';
-	_add_class(_NODE_LISTINGS, 'fancy-hide');
+	add_class(_NODE_LISTINGS, 'fancy-hide');
 
-	_NODE_TEXTAREA = _id('fancy-textarea');
+	_NODE_TEXTAREA = dom_id('fancy-textarea');
 
-	_add_event('click', _id('fancy-send'), function() {
+	add_event('click', dom_id('fancy-send'), function() {
 		_click_send();
 	});
 }
@@ -236,7 +122,7 @@ function _render_existing_chat(partial) {
 		});
 	}
 
-	var div = _id('fancy-messages');
+	var div = dom_id('fancy-messages');
 
 	div.innerHTML = _TEMPLATES.messages(_ACTIVE_THREAD);
 	div.scrollTop = div.scrollHeight;
@@ -253,15 +139,15 @@ function _render_listings() {
 	});
 
 	_NODE_LISTINGS.innerHTML = _TEMPLATES.listings(s);
-	_remove_class(_NODE_LISTINGS, 'fancy-hide');
+	remove_class(_NODE_LISTINGS, 'fancy-hide');
 
 	_NODE_CHAT.innerHTML = '';
-	_add_class(_NODE_CHAT, 'fancy-hide');
+	add_class(_NODE_CHAT, 'fancy-hide');
 }
 
 function _render_default_activator() {
 	// render the activator if it isn't already there
-	var div = _id('fancy-activator');
+	var div = dom_id('fancy-activator');
 	if ( ! div) {
 		div = document.createElement('div');
 		div.id = 'fancy-activator';
@@ -274,7 +160,7 @@ function _remove_widget() {
 	_CURRENT_VIEW = null;
 	_NODE_TEXTAREA = null;
 
-	var chat = _id('fancy-chat');
+	var chat = dom_id('fancy-chat');
 	if (chat) document.body.removeChild(chat);
 }
 
@@ -288,13 +174,13 @@ function _remove_activator() {
 	if (selector === true || selector === undefined) {
 		selector = '#fancy-activator';
 
-		var activator = _id('fancy-activator');
+		var activator = dom_id('fancy-activator');
 		if (activator) document.body.removeChild(activator);
 		return;
 	}
 
 	// just remove the click event from their activator
-	_remove_event('click', document.querySelector(selector), _CLICK_HANDLER);
+	remove_event('click', document.querySelector(selector), _CLICK_HANDLER);
 }
 
 function _set_defaults() {
@@ -335,59 +221,6 @@ function _get_avatar(id) {
 	if (_USER.avatar) return _USER.avatar;
 
 	return 'https://secure.gravatar.com/avatar/' + _EMAIL_MD5 + '?d=' + d;
-}
-
-function _get_settings(cb) {
-	_ajax({
-		method: 'GET',
-		url: '/settings'
-	}, function(ok, err) {
-		if (ok && ok.data) {
-			for (var id in ok.data) {
-				if (ok.data.hasOwnProperty(id) && ok.data[id] !== undefined) {
-					var value = ok.data[id];
-
-					switch(id) {
-						case 'app_icon':
-							_APP_ICON = value;
-							var img = new Image();
-							img.src = _get_avatar(true);
-							break;
-
-						case 'app_name':
-							_APP_NAME = value; break;
-
-						default:
-							_USERS[id] = value;
-					}
-				}
-			}
-
-			if (cb) cb();
-		}
-
-		if (err) {
-			if (err.code === 401)
-				console.warn('FancySupport client got a 401 error and is shutting down, double check your signature and app key.');
-			else
-				console.warn('FancySupport client got a ' + err.code + ' error and is shutting down.');
-
-			_clear();
-		}
-	});
-}
-
-function _get_messages(cb) {
-	_ajax({
-		method: 'GET',
-		url: '/messages'
-	}, function(ok) {
-		if (ok) {
-			_THREADS = ok.data;
-			_check_updates();
-			if (cb) cb();
-		}
-	});
 }
 
 function _has_unreads() {
@@ -442,67 +275,6 @@ function _update_active(cb) {
 	});
 }
 
-function _update_read(cb) {
-	if ( ! _ACTIVE_THREAD) return;
-
-	_ajax({
-		method: 'POST',
-		url: '/messages/' + _ACTIVE_THREAD.id + '/read'
-	}, function() {
-		if (cb) cb();
-	});
-}
-
-function _click_send() {
-	var message = _NODE_TEXTAREA.value;
-	_NODE_TEXTAREA.value = '';
-
-	if (message === '') return;
-
-	var data = {
-		content: message
-	};
-
-	if (_ACTIVE_THREAD) { // replying to an existing conversation
-		_ajax({
-			method: 'POST',
-			url: '/messages/' + _ACTIVE_THREAD.id + '/reply',
-			data: data,
-			json: true
-		}, function(ok) {
-			if (ok) {
-				// set some things on the data object so ui updates right
-				data.incoming = true;
-				data.created = Math.floor(new Date().getTime()/1000);
-				data.user_id = '';
-				_ACTIVE_THREAD.replies.push(data);
-
-				_CURRENT_VIEW = 'existing';
-				_render_existing_chat(true);
-
-				_update_active(function() {
-					_render_existing_chat(true);
-				});
-			}
-		});
-	} else {  // creating a new conversation
-		_ajax({
-			method: 'POST',
-			url: '/messages',
-			data: data,
-			json: true
-		}, function(ok) {
-			if (ok) {
-				ok.data.replies = [];
-				_ACTIVE_THREAD = ok.data;
-				_THREADS.push(_ACTIVE_THREAD);
-				_CURRENT_VIEW = 'existing';
-				_render_existing_chat();
-			}
-		});
-	}
-}
-
 function _click_chats_update() {
 	if (_CURRENT_VIEW !== 'listing') return;
 
@@ -536,7 +308,7 @@ function _click_chats() {
 
 function _finish_init() {
 	// perform this once
-	_EMAIL_MD5 = _calc_md5(_USER.email);
+	_EMAIL_MD5 = md5(_USER.email);
 
 	// preload avatar
 	var img = new Image();
@@ -548,7 +320,7 @@ function _finish_init() {
 		_get_messages();
 	}, 10*60*1000);
 
-	_attach();
+	FancySupport.attach();
 
 	String.prototype.encodeHTML = function() {
 		var encodeHTMLRules = { "&": "&#38;", "<": "&#60;", ">": "&#62;", '"': '&#34;', "'": '&#39;', "/": '&#47;' },
@@ -587,7 +359,8 @@ function _finish_init() {
 	_get_messages();
 }
 
-function _init(options) {
+// make available to client
+FancySupport.init = function init(options) {
 	if (typeof options !== 'object') {
 		console.error("FancySupport needs a config object to run.");
 		return;
@@ -640,41 +413,10 @@ function _init(options) {
 	}
 
 	_get_settings(_finish_init);
-}
+};
 
-function _impression() {
-	var impression = {};
-
-	if (_USER.name) impression.name = _USER.name;
-	if (_USER.email) impression.email = _USER.email;
-	if (_USER.phone) impression.phone = _USER.phone;
-	if (_USER.custom_data) impression.custom_data = _USER.custom_data;
-	impression.resolution = [window.innerWidth, window.innerHeight];
-
-	_ajax({method: 'POST', url: '/impression', data: impression, json: true});
-}
-
-function _event(opts, cb) {
-	// nothing or no name, so go home
-	if ( ! opts || ! opts.name) return console.error('FancySupport.event() needs an object with a name field at minimum.');
-
-	// set them all to strings since numbers produce errors
-	var event = {
-		name: ''+opts.name
-	};
-
-	if (opts.desc) event.description = ''+opts.desc;
-	if (opts.data) event.custom_data = opts.data;
-
-	_ajax({
-		method: 'POST',
-		url: '/events',
-		data: event,
-		json: true
-	}, cb);
-}
-
-function _clear() {
+// make available to client
+FancySupport.clear = function clear() {
 	if (_INITTED) {
 		_remove_activator();
 
@@ -689,9 +431,10 @@ function _clear() {
 
 		_INITTED = false;
 	}
-}
+};
 
-function _attach(selector) {
+// make available to client
+FancySupport.attach = function attach(selector) {
 	selector = selector || _SETTINGS.activator;
 
 	// update _SETTINGS with possible new value
@@ -706,13 +449,9 @@ function _attach(selector) {
 		_render_default_activator();
 	}
 
-	_add_event('click', document.querySelector(selector), _CLICK_HANDLER);
-}
-
-var FancySupport = {
-	init: _init,
-	impression: _impression,
-	event: _event,
-	clear: _clear,
-	attach: _attach
+	add_event('click', document.querySelector(selector), _CLICK_HANDLER);
 };
+
+// TODO fix these too
+FancySupport.impression = _impression;
+FancySupport.event = _event;
