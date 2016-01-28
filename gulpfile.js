@@ -57,7 +57,7 @@ gulp.task('css', function() {
 			return false;
 		});
 
-	return gulp.src('src/css/base.styl')
+	return gulp.src('src/css/fancy.styl')
 		.pipe(s)
 		.pipe(concat('../build/fancycss.css'))
 		.pipe(css2js({
