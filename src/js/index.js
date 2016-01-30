@@ -15,6 +15,8 @@ import "timeago";
 import "detect_ie";
 import "utils";
 import "api";
+import "store";
+import "view";
 import "core";
 import "templates";
 import "fancycss";

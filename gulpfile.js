@@ -30,7 +30,7 @@ gulp.task('http', function() {
 
 gulp.task('dot', function() {
 	var options = {
-		dictionary: '_TEMPLATES',
+		dictionary: 'ViewTemplates',
 		varname: 'it',
 		selfcontained: false
 	};
@@ -45,7 +45,7 @@ gulp.task('dot', function() {
 	return gulp.src('src/views/**/*')
 		.pipe(d)
 		.pipe(concat('../build/templates.js'))
-		.pipe(header('var _TEMPLATES = {};\n'))
+		.pipe(header('var ViewTemplates = {};\n'))
 		.pipe(gulp.dest('build'));
 });
 
