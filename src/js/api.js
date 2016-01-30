@@ -64,6 +64,10 @@ function FancyAPI(url, key, sig, customer_id) {
 	
 	// acknowledge messages 
 	this.read_messages = function(cb) {
+		this.request({
+			method: 'POST',
+			path: '/read'
+		}, cb);
 	};
 	
 	// send a message
