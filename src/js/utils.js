@@ -16,7 +16,7 @@ function remove_class(node, c) {
 	}
 }
 
-function _index_of(arr, e) {
+function index_of(arr, e) {
 	for (var i=0; i<arr.length; i++) {
 		if (arr[i] === e) return i;
 	}

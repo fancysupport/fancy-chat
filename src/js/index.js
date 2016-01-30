@@ -12,6 +12,7 @@
 // imports must be at teh start of the line, smash doesn't work otherwise 
 import "md5";
 import "timeago";
+import "detect_ie";
 import "utils";
 import "api";
 import "core";

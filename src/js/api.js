@@ -1,41 +1,100 @@
-function _ajax(opts, cb) {
-	var parse = function (req) {
-		var result;
-		try {
-			result = JSON.parse(req.responseText);
-		} catch (e) {
-			result = req.responseText;
+function FancyAPI(url, key, sig, customer_id) {
+	this.url = url;
+	this.key = key;
+	this.sig = sig;
+	this.customer_id = customer_id;
+
+	// general http fn
+	this.request = function(opts, cb) {
+		var r = new XMLHttpRequest();
+		r.open(opts.method, this.url+opts.path, true);
+
+		if (opts.json) {
+			r.setRequestHeader('Content-type', 'application/json');
+			opts.data = JSON.stringify(opts.data);
+		} else {
+			r.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 		}
-		return {code: req.status, data: result};
-	};
 
-	if (opts.method === 'GET') opts.url += '?bust=' + (new Date()).getTime();
+		r.setRequestHeader('Cache-Control', 'no-cache');
+		r.setRequestHeader('Pragma', 'no-cache');
+		if (detectIE()) r.setRequestHeader('If-Modified-Since', 'Sat, 01 Jan 2000 00:00:00 GMT');
+		r.setRequestHeader('X-App-Key', this.key);
+		r.setRequestHeader('X-Signature', this.sig);
+		r.setRequestHeader('X-Customer-Id', this.customer_id);
 
-	var XHR = XMLHttpRequest;
-	var request = new XHR();
-	request.open(opts.method, _URL+opts.url, true);
+		r.onreadystatechange = function () {
+			if (r.readyState === 4 && cb) {
+				var response = {code: req.status};
+				try {
+					response.data = JSON.parse(req.responseText);
+				} catch (e) {
+					response.data = req.responseText;
+				}
 
-	if (opts.json) {
-		request.setRequestHeader('Content-type', 'application/json');
-		opts.data = JSON.stringify(opts.data);
-	} else
-		request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-
-	request.setRequestHeader('X-App-Key', _SETTINGS.app_key);
-	request.setRequestHeader('X-Signature', _SETTINGS.signature);
-	request.setRequestHeader('X-Customer-Id', _USER.customer_id);
-
-	request.onreadystatechange = function () {
-		if (request.readyState === 4 && cb) {
-			var obj = parse(request);
-			if (request.status >= 200 && request.status < 300) {
-				cb(obj);
-			} else {
-				cb(null, obj.error || obj);
+				if (r.status >= 200 && r.status < 300) {
+					cb(response);
+				} else {
+					cb(null, response.error || response);
+				}
 			}
-		}
+		};
+
+		r.send(opts.data);
 	};
-	request.send(opts.data);
+
+	// get the payload
+	// includes settings for showing names and app details
+	// last X messages
+	// also records an impression for convenience
+	this.get_payload = function(cb) {
+		this.request({
+			method: 'GET',
+			path: '/payload'
+		}, cb);
+	};
+
+	// get messages 
+	this.get_messages = function(cb) {
+		this.request({
+			method: 'GET',
+			path: '/messages'
+		}, cb);
+	};
+	
+	// acknowledge messages 
+	this.read_messages = function(cb) {
+	};
+	
+	// send a message
+	this.message = function(data, cb) {
+		this.request({
+			method: 'POST',
+			path: '/messages',
+			data: data,
+			json: true
+		}, cb);
+	};
+
+	// record an impression
+	this.impression = function(data, cb) {
+		this.request({
+			method: 'POST',
+			path: '/impression',
+			data: data,
+			json: true
+		}, cb);
+	};
+
+	// record an event
+	this.event = function(data, cb) {
+		this.request({
+			method: 'POST',
+			path: '/event',
+			data: data,
+			json: true
+		}, cb);
+	};
 }
 
 function _get_settings(cb) {
