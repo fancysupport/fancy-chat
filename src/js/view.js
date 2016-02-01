@@ -1,15 +1,55 @@
 function View(store) {
 	this.store = store;
+	this.showing = false;
 
 	// resets make new stores, fn to update it
 	this.set_store = function(store) {
 		this.store = store;
 	};
 
-	// main render, do everything
-	this.render = function() {
+	this.init = function() {
+		// destroy the old container if there is one
+		this.teardown();
+
+		build.call(this);
+
+		this.show();
+	};
+
+	// show the chat interface
+	this.show = function() {
+		this.store.chat_open = true;
+		render_chat.call(this);
+	};
+
+	// hide the chat interface
+	this.hide = function() {
+		this.store.chat_open = false;
+		remove_chat.call(this);
+	};
+	
+	// break it down
+	this.teardown = function() {
+		var c = dom_id(this.store.container_id);
+		if (c) document.body.removeChild(dom_id(this.store.container_id));
+	};
+
+	// build the foundation
+	var build = function() {
+		var container = dom_elem('div', this.store.container_id);
+		document.body.appendChild(container);
+	};
+
+	var render_chat = function() {
+		var chat = dom_elem('div');
+		add_class(chat, 'chat');
+		dom_select('#'+this.store.container_id).appendChild(chat);
+	};
+
+	var remove_chat = function() {
 		
 	};
+
 }
 
 function _render_widget() {
@@ -36,9 +76,9 @@ function _render_header(data) {
 	var chatsFn = function() { _click_chats(); };
 	var newFn = function() { _render_new_chat(); };
 
-	add_event('click', dom_id('fancy-newchats'), data.which == 'fancy-icon-pencil' ? newFn : chatsFn);
+	add_event('onclick', dom_id('fancy-newchats'), data.which == 'fancy-icon-pencil' ? newFn : chatsFn);
 
-	add_event('click', dom_id('fancy-close'), function() {
+	add_event('onclick', dom_id('fancy-close'), function() {
 		_remove_widget();
 	});
 }
@@ -58,7 +98,7 @@ function _render_new_chat(reply) {
 
 	_NODE_TEXTAREA = dom_id('fancy-textarea');
 
-	add_event('click', dom_id('fancy-send'), function() {
+	add_event('onclick', dom_id('fancy-send'), function() {
 		_click_send();
 	});
 }
@@ -140,6 +180,6 @@ function _remove_activator() {
 	}
 
 	// just remove the click event from their activator
-	remove_event('click', document.querySelector(selector), _CLICK_HANDLER);
+	remove_event('onclick', document.querySelector(selector), _CLICK_HANDLER);
 }
 

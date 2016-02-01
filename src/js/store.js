@@ -3,11 +3,17 @@
 // app settings
 // all the messages and users etc
 function Store() {
+	this.container_id = 'fancysupport';
+	this.activator_id = null;
+	this.counter_id = null;
+	this.chat_open = false;
+
 	this.app_name = '';
 	this.app_icon = '';
 	this.inited = false;
 	this.log_errors = false;
 
+	this.customer = {};
 	this.messages = {};
 	this.users = {};
 

@@ -24,8 +24,7 @@ var _NODE_LISTINGS;
 var _INITTED;
 var _FETCH_INTERVAL;
 
-// set default empty values onload
-_set_defaults();
+var view;
 
 function _CLICK_HANDLER() {
 	if ( ! _INITTED) return;
@@ -50,30 +49,6 @@ function _CLICK_HANDLER() {
 			_get_messages();
 		}
 	}
-}
-
-function _set_defaults() {
-	_NODE_TEXTAREA = null;
-	_NODE_CHAT = null;
-	_NODE_LISTINGS = null;
-
-	_EMAIL_MD5 = '';
-	_CURRENT_VIEW = null;
-
-	_SETTINGS = {};
-	_USER = {};
-	_USERS = {};
-
-	_ACTIVE_THREAD = null;
-	_THREADS = [];
-
-	_APP_NAME = '';
-	_APP_ICON = '';
-
-	_INITTED = false;
-
-	if (_FETCH_INTERVAL) clearInterval(_FETCH_INTERVAL);
-	_FETCH_INTERVAL = null;
 }
 
 function _get_avatar(id) {
@@ -231,24 +206,50 @@ function _finish_init() {
 // make available to client
 FancySupport.init = function init(options) {
 	if (typeof options !== 'object') {
-		console.error("FancySupport needs a config object to run.");
+		console.error('FancySupport: requires a config object.');
 		return;
 	}
 
 	if ( ! options.signature) {
-		console.error("FancySupport needs a customer signature field: signature");
+		console.error('FancySupport: missing required signature in options.');
 		return;
 	}
 
 	if ( ! options.app_key) {
-		console.error("FancySupport needs an application key field: app_key.");
+		console.error('FancySupport: missing required app_key in options.');
 		return;
 	}
 
 	if ( ! options.customer_id) {
-		console.error("FancySupport needs a customer id field: customer_id.");
+		console.error('FancySupport: missing required customer_id in options.');
 		return;
 	}
+
+	if (options.custom_data && typeof options.custom_data !== 'object') {
+		console.error('FancySupport: custom_data needs to be an object.');
+	}
+	
+	// init the store
+	var store = new Store();
+
+	// set customer details
+	store.customer = {
+		customer_id: options.customer_id,
+		name: options.name,
+		email: options.email,
+		phone: options.phone
+	};
+
+	if (options.custom_data) store.customer.custom_data = options.custom_data;
+
+	// init render engine, remove if we have one already
+	if (view) view.teardown();
+	view = new View(store);
+	view.init();
+
+};
+
+FancySupport.initold = function init(options) {
 
 	// if they're reinitting then clear the previous
 	if (_INITTED) {
