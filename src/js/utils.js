@@ -13,7 +13,7 @@ function dom_elem(s, id) {
 }
 
 function index_of(arr, e) {
-	for (var i=0; i<arr.length; i++) {
+	for (var i = 0; i < arr.length; i++) {
 		if (arr[i] === e) return i;
 	}
 
@@ -47,14 +47,12 @@ function remove_class(node, c) {
 }
 
 function add_event(event, node, fn) {
-	if ( ! node) return;
-	if (node.addEventListener) node.addEventListener(event, fn);
-	else if (node.attachEvent) node.attachEvent(event, fn);
+	if (!node || !node.addEventListener) return;
+	node.addEventListener(event, fn);
 }
 
 function remove_event(event, node, fn) {
-	if ( ! node) return;
-	if (node.removeEventListener) node.removeEventListener(event, fn);
-	else if (node.detachEvent) node.detachEvent(event, fn);
+	if (!node || !node.removeEventListener) return;
+	node.removeEventListener(event, fn);
 }
 

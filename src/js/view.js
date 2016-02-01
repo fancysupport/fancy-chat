@@ -76,9 +76,9 @@ function _render_header(data) {
 	var chatsFn = function() { _click_chats(); };
 	var newFn = function() { _render_new_chat(); };
 
-	add_event('onclick', dom_id('fancy-newchats'), data.which == 'fancy-icon-pencil' ? newFn : chatsFn);
+	add_event('click', dom_id('fancy-newchats'), data.which == 'fancy-icon-pencil' ? newFn : chatsFn);
 
-	add_event('onclick', dom_id('fancy-close'), function() {
+	add_event('click', dom_id('fancy-close'), function() {
 		_remove_widget();
 	});
 }
@@ -98,7 +98,7 @@ function _render_new_chat(reply) {
 
 	_NODE_TEXTAREA = dom_id('fancy-textarea');
 
-	add_event('onclick', dom_id('fancy-send'), function() {
+	add_event('click', dom_id('fancy-send'), function() {
 		_click_send();
 	});
 }
@@ -180,6 +180,6 @@ function _remove_activator() {
 	}
 
 	// just remove the click event from their activator
-	remove_event('onclick', document.querySelector(selector), _CLICK_HANDLER);
+	remove_event('click', document.querySelector(selector), _CLICK_HANDLER);
 }
 

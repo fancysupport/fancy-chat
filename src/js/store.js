@@ -4,8 +4,8 @@
 // all the messages and users etc
 function Store() {
 	this.container_id = 'fancysupport';
-	this.activator_id = null;
-	this.counter_id = null;
+	this.activator_selector = null;
+	this.counter_selector = null;
 	this.chat_open = false;
 
 	this.app_name = '';

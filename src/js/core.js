@@ -205,6 +205,12 @@ function _finish_init() {
 
 // make available to client
 FancySupport.init = function init(options) {
+	// don't run on ie < 9
+	if (detectIE() && detectIE() < 9) {
+		console.warn('FancySupport: does not work in IE < 9.');
+		return;
+	}
+	
 	if (typeof options !== 'object') {
 		console.error('FancySupport: requires a config object.');
 		return;
