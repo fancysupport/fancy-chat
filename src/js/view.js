@@ -1,6 +1,5 @@
 function View(store) {
 	this.store = store;
-	this.showing = false;
 
 	// resets make new stores, fn to update it
 	this.set_store = function(store) {
@@ -12,32 +11,70 @@ function View(store) {
 		this.teardown();
 
 		build.call(this);
+		this.attach();
+	};
 
-		this.show();
+	// optionally pass a selector in so users can attach to dom elements
+	// used for SPA with re-renders changing dom
+	this.attach = function(selector) {
+		var s = selector || this.store.activator_selector;
+
+		// no selector means we are probably just using the default activator
+		if (!s) return;
+
+		// add the click handler
+		add_event('click', dom_select(s), make_handler(this));
+
+		if (this.store.counter_selector) dom_select(this.store.counter_selector).textContent = Math.round(Math.random()*1000);
 	};
 
 	// show the chat interface
 	this.show = function() {
 		this.store.chat_open = true;
 		render_chat.call(this);
+
+		// hide the default activator
+		if (this.store.default_activator) add_class(dom_select('#'+this.store.container_id+' .activator'), 'hide');
 	};
 
 	// hide the chat interface
 	this.hide = function() {
 		this.store.chat_open = false;
 		remove_chat.call(this);
+
+		// show the default activator
+		if (this.store.default_activator) remove_class(dom_select('#'+this.store.container_id+' .activator'), 'hide');
 	};
 	
 	// break it down
 	this.teardown = function() {
-		var c = dom_id(this.store.container_id);
-		if (c) document.body.removeChild(dom_id(this.store.container_id));
+		var container = dom_id(this.store.container_id);
+		if (container) container.remove();
 	};
 
 	// build the foundation
 	var build = function() {
 		var container = dom_elem('div', this.store.container_id);
+
+		// if we are using the default activator create it
+		if (this.store.default_activator) {
+			var activator = dom_elem('div');
+			activator.innerHTML = ViewTemplates.activator();
+
+			// add the handler to it
+			add_event('click', activator.firstChild, make_handler(this));
+
+			container.appendChild(activator.firstChild);
+		}
+
 		document.body.appendChild(container);
+	};
+
+	var make_handler = function(that) {
+		return function() {
+			if (that.store.chat_open) that.hide();
+			else that.show();
+		};
 	};
 
 	var render_chat = function() {
@@ -47,7 +84,8 @@ function View(store) {
 	};
 
 	var remove_chat = function() {
-		
+		var chat = dom_select('#'+this.store.container_id + ' .chat');
+		if (chat) chat.remove();
 	};
 
 }

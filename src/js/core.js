@@ -237,6 +237,9 @@ FancySupport.init = function init(options) {
 	
 	// init the store
 	var store = new Store();
+	store.default_activator = !options.hide_default_activator;
+	store.activator_selector = options.activator || null;
+	store.counter_selector = options.counter || null;
 
 	// set customer details
 	store.customer = {

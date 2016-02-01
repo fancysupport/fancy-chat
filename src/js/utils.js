@@ -41,7 +41,7 @@ function add_class(node, c) {
 function remove_class(node, c) {
 	if (node && has_class(node, c)) {
 		var classes = node.className.split(' ');
-		classes.splice(_index_of(classes, c), 1);
+		classes.splice(index_of(classes, c), 1);
 		node.className = classes.join(' ');
 	}
 }

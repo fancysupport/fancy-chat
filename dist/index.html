@@ -7,6 +7,7 @@
 	<h1>Fancy Support js client test page</h1>
 	<p>Some boring content goes here.</p>
 	<p><a href="https://fancysupport.com">fancysupport.com</a></p>
+	<p id="support"><a class="link" href="#">support</a> <span class="counter"></span></p>
 
 	<script type="text/javascript" src="/client.js"></script>
 	<script>
@@ -17,7 +18,10 @@
 			email: 'nathan@fancysupport.com',
 			phone: '123432123',
 			customer_id: '545871964c129f718d000002',
-			log_errors: true
+			log_errors: true,
+			hide_default_activator: false,
+			activator: '#support .link',
+			counter: '#support .counter'
 		});
 	</script>
 </body>
