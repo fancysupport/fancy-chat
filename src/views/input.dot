@@ -1,0 +1,10 @@
+<div class="input">
+	<div class="input-container">
+		<textarea placeholder="Send a message to {{=it.app_name}}"></textarea>
+		<div class="textcopy"></div>
+	</div>
+	
+	<div class="powered-by-fancy">
+		powered by <a href="https://fancysupport.com" target="_new">fancysupport.com</a>
+	</div>
+</div>

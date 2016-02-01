@@ -123,6 +123,32 @@ function View(store) {
 	var render_input = function() {
 		var chat = this.select('.chat');
 		if (!chat) return;
+		//
+		// assemble relevant data from store
+		var data = {
+			app_name: this.store.app_name
+		};
+
+		// render template
+		var input = dom_elem('div');
+		input.innerHTML = ViewTemplates.input(data);
+
+		// attach handler for copying text to do fancy auto sizing
+		var copy = function(input) {
+			return function() {
+				var text = input.firstChild.querySelector('textarea').value;
+				console.log(text);
+				var content = text.replace(/\n/g, '<br/>');
+				input.firstChild.querySelector('.textcopy').innerHTML = content;
+			};
+		};
+		add_event('change', input.firstChild, copy(input.firstChild));
+		add_event('keyup', input.firstChild, copy(input.firstChild));
+		add_event('keydown', input.firstChild, copy(input.firstChild));
+		// run it now to get size set
+		copy();
+
+		chat.appendChild(input.firstChild);
 	};
 
 	// convenience selecting of children in the container
