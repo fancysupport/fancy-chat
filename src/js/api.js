@@ -25,11 +25,11 @@ function FancyAPI(url, key, sig, customer_id) {
 
 		r.onreadystatechange = function () {
 			if (r.readyState === 4 && cb) {
-				var response = {code: req.status};
+				var response = {code: r.status};
 				try {
-					response.data = JSON.parse(req.responseText);
+					response.data = JSON.parse(r.responseText);
 				} catch (e) {
-					response.data = req.responseText;
+					response.data = r.responseText;
 				}
 
 				if (r.status >= 200 && r.status < 300) {

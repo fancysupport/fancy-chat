@@ -1,4 +1,3 @@
-var _CLICK_HANDLER; // activator click function
 var _OLD_ONERROR; // previous value of window.onerror
 var _URL_HOST = 'https://api.fancysupport.com';
 var _URL_PORT = '';
@@ -25,31 +24,6 @@ var _INITTED;
 var _FETCH_INTERVAL;
 
 var view;
-
-function _CLICK_HANDLER() {
-	if ( ! _INITTED) return;
-
-	_render_widget();
-
-	if (_ACTIVE_THREAD) {
-		// get something out quick
-		_CURRENT_VIEW = 'existing';
-		_render_existing_chat();
-
-		// get the most recent version of active
-		_update_active(function() {
-			_render_existing_chat();
-		});
-	} else {
-		if (_has_unreads()) {
-			_click_chats();
-		} else {
-			// get new versions on open
-			_render_new_chat();
-			_get_messages();
-		}
-	}
-}
 
 function _get_avatar(id) {
 	var d = 'mm';
@@ -258,60 +232,6 @@ FancySupport.init = function init(options) {
 
 };
 
-FancySupport.initold = function init(options) {
-
-	// if they're reinitting then clear the previous
-	if (_INITTED) {
-		_clear();
-	}
-
-	// setup initial settings
-	_set_defaults();
-
-	_SETTINGS = {
-		app_key: options.app_key,
-		signature: options.signature,
-		default_avatar: options.default_avatar,
-		activator: options.activator,
-		unread_counter: options.unread_counter || '#fancy-unread-counter',
-		log_errors: options.log_errors
-	};
-
-	_USER.customer_id = options.customer_id;
-
-	if (options.name) _USER.name = options.name;
-	if (options.email) _USER.email = options.email;
-	if (options.phone) _USER.phone = options.phone;
-	if (options.avatar) _USER.avatar = options.avatar;
-
-	if (options.custom_data) {
-		if (typeof options.custom_data === 'object')
-			_USER.custom_data = options.custom_data;
-		else
-			console.error('FancySupport custom_data needs to be an object.');
-	}
-
-	_get_settings(_finish_init);
-};
-
-// make available to client
-FancySupport.clear = function clear() {
-	if (_INITTED) {
-		_remove_activator();
-
-		if (_SETTINGS.unread_counter) {
-			var node = document.querySelector(_SETTINGS.unread_counter);
-			if (node) node.innerHTML = '';
-		}
-
-		_set_defaults();
-		_remove_widget();
-		window.onerror = _OLD_ONERROR || function(){};
-
-		_INITTED = false;
-	}
-};
-
 // make available to client
 FancySupport.attach = function attach(selector) {
 	selector = selector || _SETTINGS.activator;
@@ -334,3 +254,14 @@ FancySupport.attach = function attach(selector) {
 // TODO fix these too
 FancySupport.impression = _impression;
 FancySupport.event = _event;
+FancySupport.messages = function() {
+	var api = new FancyAPI(
+		'http://local.fancysupport.com:4000/client',
+		'4nBDCN8yMwP5TkLPOKrdC50mBiEIVbKz',
+		'90871c583fd68c318fcad7df0319ab53656eb42c',
+		'545871964c129f718d000002'
+	);
+	api.get_messages(function(data, err) {
+		console.log(data, err);
+	});	
+};
