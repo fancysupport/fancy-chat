@@ -9,7 +9,7 @@ function Store() {
 	this.counter_selector = null;
 	this.chat_open = false;
 
-	this.app_name = '';
+	this.app_name = 'test app name';
 	this.app_icon = '';
 	this.inited = false;
 	this.log_errors = false;

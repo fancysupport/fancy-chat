@@ -12,6 +12,8 @@ function View(store) {
 
 		build.call(this);
 		this.attach();
+
+		this.show();
 	};
 
 	// optionally pass a selector in so users can attach to dom elements
@@ -34,7 +36,7 @@ function View(store) {
 		render_chat.call(this);
 
 		// hide the default activator
-		if (this.store.default_activator) add_class(dom_select('#'+this.store.container_id+' .activator'), 'hide');
+		if (this.store.default_activator) add_class(this.select('.activator'), 'hide');
 	};
 
 	// hide the chat interface
@@ -43,7 +45,7 @@ function View(store) {
 		remove_chat.call(this);
 
 		// show the default activator
-		if (this.store.default_activator) remove_class(dom_select('#'+this.store.container_id+' .activator'), 'hide');
+		if (this.store.default_activator) remove_class(this.select('.activator'), 'hide');
 	};
 	
 	// break it down
@@ -81,13 +83,52 @@ function View(store) {
 		var chat = dom_elem('div');
 		add_class(chat, 'chat');
 		dom_select('#'+this.store.container_id).appendChild(chat);
+
+		// render all the other components
+		render_header.call(this);
+		render_messages.call(this);
+		render_input.call(this);
 	};
 
 	var remove_chat = function() {
-		var chat = dom_select('#'+this.store.container_id + ' .chat');
+		var chat = this.select('.chat');
 		if (chat) chat.remove();
 	};
 
+	var render_header = function() {
+		var chat = this.select('.chat');
+		if (!chat) return;
+
+		// assemble relevant data from store
+		var data = {
+			title: this.store.app_name
+		};
+
+		// render template
+		var header = dom_elem('div');
+		header.innerHTML = ViewTemplates.header(data);
+
+		// attach a close handler
+		var close = header.firstChild.querySelector('.close');
+		add_event('click', close, make_handler(this));
+
+		chat.appendChild(header.firstChild);
+	};
+
+	var render_messages = function() {
+		var chat = this.select('.chat');
+		if (!chat) return;
+	};
+
+	var render_input = function() {
+		var chat = this.select('.chat');
+		if (!chat) return;
+	};
+
+	// convenience selecting of children in the container
+	this.select = function(s) {
+		return dom_select('#' + this.store.container_id + ' ' + s);
+	};
 }
 
 function _render_widget() {
