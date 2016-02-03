@@ -134,7 +134,15 @@ function View(store) {
 		var messages = dom_elem('div');
 		messages.innerHTML = ViewTemplates.messages(data);
 
-		chat.appendChild(messages.firstChild);
+		// replace content if it exists
+		var existing = this.select('.chat .messages');
+		if (existing) {
+			existing.innerHTML = messages.firstChild.innerHTML;
+			this.set_chat_size();
+		}
+		else {
+			chat.appendChild(messages.firstChild);
+		}
 	};
 
 	var render_input = function() {
@@ -151,10 +159,26 @@ function View(store) {
 		input.innerHTML = ViewTemplates.input(data);
 
 		// attach handler for copying text to do fancy auto sizing
-		var copy = function(input) {
-			var text = input.firstChild.querySelector('textarea').value;
+		var copy = function(input, e) {
+			var text = input.querySelector('textarea').value;
+
+			// we need to intercept the enter key to send the message ~
+			// reset the inputs too
+			if (e && e.which === 13 && !e.shiftKey && e.type === "keydown") {
+				e.preventDefault();
+				this.store.messages.push({created:1234, content: text});
+				input.querySelector('textarea').value = '';
+				input.querySelector('.textcopy').innerHTML = '';
+				this.messages_changed();
+				return;
+			}
+			if (e && e.which === 13 && !e.shiftKey && e.type === "keyup") {
+				e.preventDefault();
+				return;
+			}
+
 			var content = text.replace(/\n/g, '<br/>');
-			input.firstChild.querySelector('.textcopy').innerHTML = content;
+			input.querySelector('.textcopy').innerHTML = content;
 			// need to make sure the size of messages list stays true
 			this.set_chat_size();
 		};
@@ -165,6 +189,12 @@ function View(store) {
 		copy.call(this, input.firstChild);
 
 		chat.appendChild(input.firstChild);
+	};
+
+	// for re-rendering when store has new messages
+	this.messages_changed = function() {
+		// out with the old in with the new
+		render_messages.call(this);
 	};
 
 	// requires header, messages and input to be rendered
@@ -190,7 +220,6 @@ function View(store) {
 
 		chat.style.height = viewport.height+'px';
 		messages.style.height = (viewport.height - header_height - input_height)+'px';
-		console.log('size set', messages.style.height, viewport.height, header_height, input_height);
 	};
 
 	// for attaching/removing from resize event

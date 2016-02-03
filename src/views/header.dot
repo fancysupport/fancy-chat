@@ -12,5 +12,5 @@
 		</g>
 		</svg>
 	</div>
-	<span class="title">{{= it.title }}</span>
+	<span class="title">{{!it.title}}</span>
 </div>
