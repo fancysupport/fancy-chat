@@ -15,7 +15,23 @@ function Store() {
 	this.log_errors = false;
 
 	this.customer = {};
-	this.messages = {};
+	this.messages = [{
+    "id": "56978502fb1d88590066beab",
+    "app_id": "53e591cf4c129f663a000001",
+    "created": 1452770562,
+    "customer_id": "545871964c129f718d000002",
+    "user_id": "",
+    "incoming": true,
+    "content": "weow a new message"
+		}, {
+    "id": "5697770bfb1d88590066be9e",
+    "app_id": "53e591cf4c129f663a000001",
+    "created": 1452766987,
+    "customer_id": "545871964c129f718d000002",
+    "user_id": "",
+    "incoming": true,
+    "content": "hi"
+		}];
 	this.users = {};
 
 	// keeping track of the user input as they type for re-renders

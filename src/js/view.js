@@ -52,6 +52,9 @@ function View(store) {
 	this.teardown = function() {
 		var container = dom_id(this.store.container_id);
 		if (container) container.remove();
+
+		// can't forget to remove the resize listener
+		window.removeEventListener('resize', this.resize_handler);
 	};
 
 	// build the foundation
@@ -70,6 +73,9 @@ function View(store) {
 		}
 
 		document.body.appendChild(container);
+
+		// add the window resize handler
+		window.addEventListener('resize', this.resize_handler);
 	};
 
 	var make_handler = function(that) {
@@ -88,6 +94,9 @@ function View(store) {
 		render_header.call(this);
 		render_messages.call(this);
 		render_input.call(this);
+
+		// set chat size on initial render
+		this.set_chat_size();
 	};
 
 	var remove_chat = function() {
@@ -118,12 +127,20 @@ function View(store) {
 	var render_messages = function() {
 		var chat = this.select('.chat');
 		if (!chat) return;
+
+		// format the data
+		var data = this.store.messages;
+
+		var messages = dom_elem('div');
+		messages.innerHTML = ViewTemplates.messages(data);
+
+		chat.appendChild(messages.firstChild);
 	};
 
 	var render_input = function() {
 		var chat = this.select('.chat');
 		if (!chat) return;
-		//
+		
 		// assemble relevant data from store
 		var data = {
 			app_name: this.store.app_name
@@ -135,21 +152,49 @@ function View(store) {
 
 		// attach handler for copying text to do fancy auto sizing
 		var copy = function(input) {
-			return function() {
-				var text = input.firstChild.querySelector('textarea').value;
-				console.log(text);
-				var content = text.replace(/\n/g, '<br/>');
-				input.firstChild.querySelector('.textcopy').innerHTML = content;
-			};
+			var text = input.firstChild.querySelector('textarea').value;
+			var content = text.replace(/\n/g, '<br/>');
+			input.firstChild.querySelector('.textcopy').innerHTML = content;
+			// need to make sure the size of messages list stays true
+			this.set_chat_size();
 		};
-		add_event('change', input.firstChild, copy(input.firstChild));
-		add_event('keyup', input.firstChild, copy(input.firstChild));
-		add_event('keydown', input.firstChild, copy(input.firstChild));
-		// run it now to get size set
-		copy();
+		add_event('change', input.firstChild, copy.bind(this, input.firstChild));
+		add_event('keyup', input.firstChild, copy.bind(this, input.firstChild));
+		add_event('keydown', input.firstChild, copy.bind(this, input.firstChild));
+		// run it now to get the size set
+		copy.call(this, input.firstChild);
 
 		chat.appendChild(input.firstChild);
 	};
+
+	// requires header, messages and input to be rendered
+	// dynamic sizing of messages list, better than css
+	this.set_chat_size = function() {
+		var chat = this.select('.chat');
+		var header = this.select('.chat .header');
+		var messages = this.select('.chat .messages');
+		var input = this.select('.chat .input');
+
+		if (!chat || !header || !messages || !input) return;
+
+		// getting the viewport size requires a hack since window.innerHeight isn't reliable on mobile
+		// also browsers decide to include window chroming sometimes and blah blah
+		var test = document.createElement('div');
+		test.style.cssText = 'position: fixed; top: 0; left: 0; bottom: 0; right: 0;';
+		document.documentElement.insertBefore(test, document.documentElement.firstChild);
+		var viewport = {width: test.offsetWidth, height: test.offsetHeight};
+		document.documentElement.removeChild(test);
+
+		var header_height = header.offsetHeight;
+		var input_height = input.offsetHeight;
+
+		chat.style.height = viewport.height+'px';
+		messages.style.height = (viewport.height - header_height - input_height)+'px';
+		console.log('size set', messages.style.height, viewport.height, header_height, input_height);
+	};
+
+	// for attaching/removing from resize event
+	this.resize_handler = this.set_chat_size.bind(this);
 
 	// convenience selecting of children in the container
 	this.select = function(s) {

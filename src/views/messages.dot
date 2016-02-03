@@ -11,9 +11,10 @@
 	</div>
 #}}
 
-
-{{#def.message:it}}
-
-{{~ it.replies :m }}
-	{{#def.message:m}}
-{{~}}
+<div class="messages">
+	{{~it :msg}}
+		<div class="message">
+			{{=msg.created}} - {{=msg.content}}
+		</div>
+	{{~}}
+</div>

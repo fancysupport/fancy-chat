@@ -18,6 +18,9 @@ box-sizing()
 	z-index 9999998
 	position fixed
 	font-family 'Helvetica Neue', Helvetica, Arial, sans-serif
+	border 0
+	padding 0
+	margin 0
 
 	.activator
 		position fixed
@@ -41,11 +44,12 @@ box-sizing()
 			display none
 
 	.chat
+		border 0
 		border-left 1px solid #dadada
 		position fixed
 		right 0
+		top 0
 		bottom 0
-		height 100%
 		width 350px
 		background-color #fafafa
 
@@ -78,7 +82,7 @@ box-sizing()
 
 		.input
 			box-sizing border-box
-			border 1px solid #000
+			padding-top 10px
 
 			.input-container
 				position relative
@@ -87,31 +91,30 @@ box-sizing()
 				.textcopy
 					width 330px
 					box-sizing border-box
-					font-size 1em
+					font-size 14px
 					border 1px solid #dadada
 					border-radius 0
 					padding 5px
 					overflow-y auto
 					font-family 'Helvetica Neue', Helvetica, Arial, sans-serif
+					margin 0 10px
 
 				textarea
 					resize none
 					height 100%
 					position absolute
-					margin 0 10px
 
 				.textcopy
 					visibility hidden
 					min-height 30px
 					max-height 200px
-					margin 10px
 					word-break break-word
 
 				.send
 					height 30px
 					color #0A435F
 					border 0
-					font-size 16px
+					font-size 14px
 					font-weight bold
 					display inline-block
 					line-height 30px
@@ -120,8 +123,8 @@ box-sizing()
 
 			.powered-by-fancy
 				text-align center
-				padding 5px
-				font-size 12px
+				padding 15px 5px 5px 5px
+				font-size 11px
 				color #9a9a9a
 				a
 					font-size 12px
