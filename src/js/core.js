@@ -225,9 +225,17 @@ FancySupport.init = function init(options) {
 
 	if (options.custom_data) store.customer.custom_data = options.custom_data;
 
+	// init api
+	var api = new FancyAPI(
+		'http://local.fancysupport.com:4000/client',
+		'4nBDCN8yMwP5TkLPOKrdC50mBiEIVbKz',
+		'90871c583fd68c318fcad7df0319ab53656eb42c',
+		'545871964c129f718d000002'
+	);
+
 	// init render engine, remove if we have one already
 	if (view) view.teardown();
-	view = new View(store);
+	view = new View(store, api);
 	view.init();
 
 };

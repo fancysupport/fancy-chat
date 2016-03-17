@@ -1,7 +1,7 @@
 <div class="messages">
 	{{~it :msg}}
 		<div class="message">
-			{{!msg.created}} - {{!msg.content}}
+			{{=timeago(msg.created)}} - {{!msg.content}}
 		</div>
 	{{~}}
 </div>

@@ -1,5 +1,6 @@
-function View(store) {
+function View(store, api) {
 	this.store = store;
+	this.api = api;
 
 	// resets make new stores, fn to update it
 	this.set_store = function(store) {
@@ -55,6 +56,11 @@ function View(store) {
 
 		// can't forget to remove the resize listener
 		window.removeEventListener('resize', this.resize_handler);
+	};
+
+	this.handle_api_response = function(data, err) {
+		if (data) console.log('result', data);
+		if (err) console.error(err);
 	};
 
 	// build the foundation
@@ -166,10 +172,18 @@ function View(store) {
 			// reset the inputs too
 			if (e && e.which === 13 && !e.shiftKey && e.type === "keydown") {
 				e.preventDefault();
-				this.store.messages.push({created:1234, content: text});
+				var msg = {created: unix(), content: text};
+
+				// optimism
+				this.store.messages.push(msg);
+				this.messages_changed();
+
+				// api send
+				this.api.message(msg, this.handle_api_response);
+
 				input.querySelector('textarea').value = '';
 				input.querySelector('.textcopy').innerHTML = '';
-				this.messages_changed();
+
 				return;
 			}
 			if (e && e.which === 13 && !e.shiftKey && e.type === "keyup") {

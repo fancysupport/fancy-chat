@@ -25,3 +25,7 @@ function timeago(time) {
 		return span + ' ago';
 }
 
+function unix(d) {
+	d = (d && d.getTime) ? d : new Date();
+	return Math.floor(d.getTime()/1000);
+}
