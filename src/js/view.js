@@ -172,7 +172,7 @@ function View(store, api) {
 			// reset the inputs too
 			if (e && e.which === 13 && !e.shiftKey && e.type === "keydown") {
 				e.preventDefault();
-				var msg = {created: unix(), content: text};
+				var msg = {incoming: true, created: unix(), content: text.replace(/\n+$/,'')};
 
 				// optimism
 				this.store.messages.push(msg);

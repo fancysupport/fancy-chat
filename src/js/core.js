@@ -273,3 +273,16 @@ FancySupport.messages = function() {
 		console.log(data, err);
 	});	
 };
+FancySupport.payload = function() {
+	var api = new FancyAPI(
+		'http://local.fancysupport.com:4000/client',
+		'4nBDCN8yMwP5TkLPOKrdC50mBiEIVbKz',
+		'90871c583fd68c318fcad7df0319ab53656eb42c',
+		'545871964c129f718d000002'
+	);
+	api.payload({
+		
+	}, function(data, err) {
+		console.log(data, err);
+	});	
+};

@@ -47,10 +47,12 @@ function FancyAPI(url, key, sig, customer_id) {
 	// includes settings for showing names and app details
 	// last X messages
 	// also records an impression for convenience
-	this.get_payload = function(cb) {
+	this.payload = function(data, cb) {
 		this.request({
-			method: 'GET',
-			path: '/payload'
+			method: 'POST',
+			path: '/payload',
+			data: data,
+			json: true
 		}, cb);
 	};
 

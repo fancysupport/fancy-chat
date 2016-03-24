@@ -1,7 +1,19 @@
 <div class="messages">
 	{{~it :msg}}
 		<div class="message">
-			{{=timeago(msg.created)}} - {{!msg.content}}
+			{{? msg.incoming}}
+				<div class="from_customer">
+					<div class="avatar"></div>
+					<div class="content">{{!msg_content(msg.content)}}</div>
+					<div class="info">You, {{=timeago(msg.created)}}</div>
+				</div>
+			{{??}}
+				<div class="from_fancy">
+					<div class="avatar"></div>
+					<div class="content">{{!msg_content(msg.content)}}</div>
+					<div class="info">{{=msg.user_id}}, {{=timeago(msg.created)}}</div>
+				</div>
+			{{?}}
 		</div>
 	{{~}}
 </div>

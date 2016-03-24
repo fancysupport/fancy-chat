@@ -30,8 +30,16 @@ function Store() {
     "customer_id": "545871964c129f718d000002",
     "user_id": "",
     "incoming": true,
-    "content": "hi"
-		}];
+    "content": "hi\n\nnew line and shit\n\n\n\n"
+		}, {
+    "id": "553fe8794c129f32aa00000b",
+    "app_id": "53e591cf4c129f663a000001",
+    "created": 1430251641,
+    "customer_id": "545871964c129f718d000002",
+    "user_id": "545871964c129f718d000002",
+    "incoming": false,
+    "content": "a"
+	}];
 	this.users = {};
 
 	// keeping track of the user input as they type for re-renders

@@ -56,3 +56,6 @@ function remove_event(event, node, fn) {
 	node.removeEventListener(event, fn);
 }
 
+function msg_content(content) {
+	return content.replace(/\n+$/,'');
+}
