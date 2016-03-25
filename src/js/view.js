@@ -110,9 +110,6 @@ function View(store, api) {
 
 		// set chat size on initial render
 		this.set_chat_size();
-
-		// scroll messages to bottom
-		scroll_messages.call(this);
 	};
 
 	var remove_chat = function() {
@@ -164,10 +161,6 @@ function View(store, api) {
 		else {
 			chat.appendChild(messages.firstChild);
 		}
-	};
-
-	var scroll_messages = function() {
-		this.select('.chat .messages').scrollTop = 100000;
 	};
 
 	var render_input = function() {
@@ -249,7 +242,6 @@ function View(store, api) {
 	this.messages_changed = function() {
 		// out with the old in with the new
 		render_messages.call(this);
-		scroll_messages.call(this);
 	};
 
 	// requires header, messages and input to be rendered
@@ -275,6 +267,9 @@ function View(store, api) {
 
 		chat.style.height = viewport.height+'px';
 		messages.style.height = (viewport.height - header_height - input_height)+'px';
+
+		// scroll the messages
+		messages.scrollTop = messages.scrollHeight;
 	};
 
 	// for attaching/removing from resize event

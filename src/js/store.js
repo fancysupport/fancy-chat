@@ -31,6 +31,8 @@ function Store() {
 		if (this.customer.phone) d.phone = this.customer.phone;
 		if (this.customer.custom_data) d.custom_data = this.customer.custom_data;
 
+		d.resolution = [window.innerWidth, window.innerHeight];
+
 		return d;
 	};
 
