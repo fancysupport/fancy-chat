@@ -1,15 +1,15 @@
 <div class="messages">
-	{{~it :msg}}
+	{{~it.messages :msg}}
 		<div class="message">
 			{{? msg.incoming}}
 				<div class="from_customer">
-					<div class="avatar"></div>
+					<div class="avatar"><img src="{{=it.customer_avatar}}" /></div>
 					<div class="content">{{!msg_content(msg.content)}}</div>
 					<div class="info">You, {{=timeago(msg.created)}}</div>
 				</div>
 			{{??}}
 				<div class="from_fancy">
-					<div class="avatar"></div>
+					<div class="avatar"><img src="{{=it.fancy_avatar}}" /></div>
 					<div class="content">{{!msg_content(msg.content)}}</div>
 					<div class="info">{{=msg.user_id}}, {{=timeago(msg.created)}}</div>
 				</div>

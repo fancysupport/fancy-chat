@@ -2,17 +2,28 @@ function View(store, api) {
 	this.store = store;
 	this.api = api;
 
-	// resets make new stores, fn to update it
-	this.set_store = function(store) {
-		this.store = store;
-	};
-
 	this.init = function() {
 		// destroy the old container if there is one
 		this.teardown();
 
 		build.call(this);
 		this.attach();
+
+		// fetch the payload
+		var that = this;
+		this.api.payload(this.store.impression_data(), function(res, err) {
+			console.log('payload', res, err);
+			if (check_api_error(err)) return;
+
+			if (Array.isArray(res.data.messages)) {
+				that.store.messages = res.data.messages;
+				console.log('set messages from payload');
+			}
+			if (typeof res.data.settings === 'object') {
+				that.store.settings = res.data.settings;
+			}
+			that.rerender();
+		});
 
 		this.show();
 	};
@@ -34,6 +45,7 @@ function View(store, api) {
 	// show the chat interface
 	this.show = function() {
 		this.store.chat_open = true;
+		remove_chat.call(this);
 		render_chat.call(this);
 
 		// hide the default activator
@@ -56,11 +68,6 @@ function View(store, api) {
 
 		// can't forget to remove the resize listener
 		window.removeEventListener('resize', this.resize_handler);
-	};
-
-	this.handle_api_response = function(data, err) {
-		if (data) console.log('result', data);
-		if (err) console.error(err);
 	};
 
 	// build the foundation
@@ -116,7 +123,7 @@ function View(store, api) {
 
 		// assemble relevant data from store
 		var data = {
-			title: this.store.app_name
+			title: this.store.settings.app_name
 		};
 
 		// render template
@@ -135,7 +142,11 @@ function View(store, api) {
 		if (!chat) return;
 
 		// format the data
-		var data = this.store.messages;
+		var data = {
+			messages: this.store.messages,
+			customer_avatar: this.store.customer_avatar(),
+			fancy_avatar: this.store.fancy_avatar()
+		};
 
 		var messages = dom_elem('div');
 		messages.innerHTML = ViewTemplates.messages(data);
@@ -157,7 +168,7 @@ function View(store, api) {
 		
 		// assemble relevant data from store
 		var data = {
-			app_name: this.store.app_name
+			app_name: this.store.settings.app_name
 		};
 
 		// render template
@@ -179,7 +190,12 @@ function View(store, api) {
 				this.messages_changed();
 
 				// api send
-				this.api.message(msg, this.handle_api_response);
+				this.api.message(msg, function(data, err) {
+					if (check_api_error(err)) return;
+
+					
+
+				});
 
 				input.querySelector('textarea').value = '';
 				input.querySelector('.textcopy').innerHTML = '';
@@ -203,6 +219,15 @@ function View(store, api) {
 		copy.call(this, input.firstChild);
 
 		chat.appendChild(input.firstChild);
+	};
+
+	// for re-rendering when data changes
+	this.rerender = function() {
+		console.log('rerender', this.store);
+		if (this.store.chat_open) {
+			remove_chat.call(this);
+			render_chat.call(this);
+		}
 	};
 
 	// for re-rendering when store has new messages
@@ -242,5 +267,20 @@ function View(store, api) {
 	// convenience selecting of children in the container
 	this.select = function(s) {
 		return dom_select('#' + this.store.container_id + ' ' + s);
+	};
+
+	var check_api_error = function(err) {
+		if (err) {
+			if (err.code === 401) {
+				console.warn('FancySupport: client received a 401 error. Check your signature and app key are correct.');
+			}
+			else {
+				console.warn('FancySupport: client received a ' + err.code + ' error.');
+			}
+
+			return true;
+		}
+
+		return false;
 	};
 }

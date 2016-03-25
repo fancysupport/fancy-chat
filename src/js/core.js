@@ -25,22 +25,6 @@ var _FETCH_INTERVAL;
 
 var view;
 
-function _get_avatar(id) {
-	var d = 'mm';
-
-	// if there's a default image given, or one of gravatars, use that
-	if (_SETTINGS.default_avatar) d = _SETTINGS.default_avatar;
-
-	// if there's an id, it's a fancy dude
-	if (id)
-		return _APP_ICON ? '//cdn.fancy.support/' + _APP_ICON : 'https://secure.gravatar.com/avatar/?d=' + d;
-
-	// use the avatar they gave us if available
-	if (_USER.avatar) return _USER.avatar;
-
-	return 'https://secure.gravatar.com/avatar/' + _EMAIL_MD5 + '?d=' + d;
-}
-
 function _has_unreads() {
 	for (var i=0; i<_THREADS.length; i++) {
 		if (_THREADS[i].unread) return true;
@@ -220,6 +204,7 @@ FancySupport.init = function init(options) {
 		customer_id: options.customer_id,
 		name: options.name,
 		email: options.email,
+		email_md5: md5(options.email),
 		phone: options.phone
 	};
 
@@ -270,19 +255,6 @@ FancySupport.messages = function() {
 		'545871964c129f718d000002'
 	);
 	api.get_messages(function(data, err) {
-		console.log(data, err);
-	});	
-};
-FancySupport.payload = function() {
-	var api = new FancyAPI(
-		'http://local.fancysupport.com:4000/client',
-		'4nBDCN8yMwP5TkLPOKrdC50mBiEIVbKz',
-		'90871c583fd68c318fcad7df0319ab53656eb42c',
-		'545871964c129f718d000002'
-	);
-	api.payload({
-		
-	}, function(data, err) {
 		console.log(data, err);
 	});	
 };
