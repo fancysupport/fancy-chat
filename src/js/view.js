@@ -110,6 +110,9 @@ function View(store, api) {
 
 		// set chat size on initial render
 		this.set_chat_size();
+
+		// scroll messages to bottom
+		scroll_messages.call(this);
 	};
 
 	var remove_chat = function() {
@@ -143,10 +146,11 @@ function View(store, api) {
 
 		// format the data
 		var data = {
-			messages: this.store.messages,
+			messages: this.store.messages_formatted(),
 			customer_avatar: this.store.customer_avatar(),
 			fancy_avatar: this.store.fancy_avatar()
 		};
+		console.log(data);
 
 		var messages = dom_elem('div');
 		messages.innerHTML = ViewTemplates.messages(data);
@@ -160,6 +164,10 @@ function View(store, api) {
 		else {
 			chat.appendChild(messages.firstChild);
 		}
+	};
+
+	var scroll_messages = function() {
+		this.select('.chat .messages').scrollTop = 100000;
 	};
 
 	var render_input = function() {
@@ -183,19 +191,27 @@ function View(store, api) {
 			// reset the inputs too
 			if (e && e.which === 13 && !e.shiftKey && e.type === "keydown") {
 				e.preventDefault();
-				var msg = {incoming: true, created: unix(), content: text.replace(/\n+$/,'')};
-
-				// optimism
-				this.store.messages.push(msg);
-				this.messages_changed();
+				var msg = {
+					id: random_id(10),
+					created: unix(),
+					content: text.replace(/\n+$/,'')
+				};
 
 				// api send
-				this.api.message(msg, function(data, err) {
+				var that = this;
+				this.api.message(msg, function(res, err) {
 					if (check_api_error(err)) return;
 
-					
-
+					that.store.messages_remove(msg.id);
+					that.store.messages_add(res.data);
+					that.messages_changed();
 				});
+
+				// optimism
+				msg.incoming = true;
+				msg.customer_id = this.store.customer.customer_id;
+				this.store.messages_add(msg);
+				this.messages_changed();
 
 				input.querySelector('textarea').value = '';
 				input.querySelector('.textcopy').innerHTML = '';
@@ -223,7 +239,6 @@ function View(store, api) {
 
 	// for re-rendering when data changes
 	this.rerender = function() {
-		console.log('rerender', this.store);
 		if (this.store.chat_open) {
 			remove_chat.call(this);
 			render_chat.call(this);
@@ -234,6 +249,7 @@ function View(store, api) {
 	this.messages_changed = function() {
 		// out with the old in with the new
 		render_messages.call(this);
+		scroll_messages.call(this);
 	};
 
 	// requires header, messages and input to be rendered

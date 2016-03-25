@@ -41,4 +41,48 @@ function Store() {
 	this.fancy_avatar = function() {
 		return 'https://cdn.fancy.support/'+this.settings.app_icon;
 	};
+
+	this.messages_remove = function(id) {
+		console.log('removing message', id);
+		for (var x = 0; x < this.messages.length; x++) {
+			if (this.messages[x].id === id) this.messages.splice(x, 1);
+		}
+	};
+
+	this.messages_add = function(msg) {
+		console.log('adding message', msg);
+		if (typeof msg !== 'object') return;
+
+		// replace if it exists
+		for (var x = 0; x < this.messages.length; x++) {
+			if (this.messages[x].id === msg.id) {
+				this.messages[x] = msg;
+				return;
+			}
+		}
+
+		this.messages.push(msg);
+	};
+
+	this.messages_formatted = function() {
+		// copies messages and adds names and returns it sorted by date
+		var x;
+		var msgs = [];
+
+		for (x = 0; x < this.messages.length; x++) {
+			msgs.push(JSON.parse(JSON.stringify(this.messages[x])));
+		}
+
+		for (x = 0; x < msgs.length; x++) {
+			if (!msgs[x].incoming) msgs[x].user_name = this.settings[msgs[x].user_id] || this.settings.app_name;
+		}
+
+		msgs.sort(function(a, b) {
+			return a.created > b.created ? 1 : -1;
+		});
+
+		return msgs;
+	};
+
 }
+

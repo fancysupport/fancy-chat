@@ -59,3 +59,13 @@ function remove_event(event, node, fn) {
 function msg_content(content) {
 	return content.replace(/\n+$/,'');
 }
+
+function random_id(len) {
+	var chars = 'abcdefghijklnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+	var id = '';
+	for (var i = 0, n = chars.length; i < len; ++i) {
+		id += chars.charAt(Math.floor(Math.random() * n));
+	}
+	return id;
+}
+
