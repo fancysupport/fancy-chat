@@ -38,8 +38,6 @@ function View(store, api) {
 
 		// add the click handler
 		add_event('click', dom_select(s), make_handler(this));
-
-		if (this.store.counter_selector) dom_select(this.store.counter_selector).textContent = Math.round(Math.random()*1000);
 	};
 
 	// show the chat interface
@@ -138,6 +136,16 @@ function View(store, api) {
 	};
 
 	var render_messages = function() {
+		// update counts
+		var count = this.store.unread_count();
+		if (this.store.counter_selector) {
+			dom_select(this.store.counter_selector).textContent = count || '';
+			if (count) add_class(dom_select(this.store.counter_selector), 'unread');
+			else remove_class(dom_select(this.store.counter_selector), 'unread');
+		}
+		if (this.store.default_activator) this.select('.activator .counter').textContent = count || '';
+
+		// nothing else to do if not showing
 		var chat = this.select('.chat');
 		if (!chat) return;
 

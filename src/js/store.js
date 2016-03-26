@@ -85,5 +85,18 @@ function Store() {
 		return msgs;
 	};
 
+	this.unread_count = function() {
+		// use last_read time to see how many messages from fancy are ahead
+		var last = Number(this.settings.last_read);
+		var count = 0;
+
+		for (var x = 0; x < this.messages.length; x++) {
+			if (this.messages[x].incoming) continue;
+			if (this.messages[x].created > last) count++;
+		}
+
+		return count;
+	};
+
 }
 

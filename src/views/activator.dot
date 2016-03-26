@@ -1,4 +1,5 @@
 <div class="activator">
+	<div class="counter"></div>
 	<svg version="1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 		 viewBox="0 0 371 371" style="enable-background:new 0 0 371 371;" xml:space="preserve">
 	<path d="M316,65c-35-28-81-43-131-43c-49,0-96,15-131,43
