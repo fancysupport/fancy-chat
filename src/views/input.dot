@@ -1,6 +1,6 @@
 <div class="input">
 	<div class="input-container">
-		<textarea placeholder="Send a message to {{!it.app_name}}"></textarea>
+		<textarea placeholder="Send a message to {{!it.app_name}}" autofocus></textarea>
 		<div class="textcopy"></div>
 	</div>
 	

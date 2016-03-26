@@ -1,5 +1,7 @@
 var view;
+var last_impression = Date.now();
 
+// catching global errors
 var catch_error = function(e) {
 	try {
 		var desc = e.message;
@@ -12,6 +14,17 @@ var catch_error = function(e) {
 		};
 
 		view.api.event(event, function() {});
+	} catch(ex) {}
+};
+
+// detecting when tab/window is focused again so we can impression
+var has_focus = function(e) {
+	try {
+		var elapsed = Date.now() - last_impression;
+		if (!document.hidden && elapsed > 5*60*1000) {
+			view.api.impression(view.store.impression_data(), function() {});
+			last_impression = Date.now();
+		}
 	} catch(ex) {}
 };
 
@@ -67,10 +80,10 @@ FancySupport.init = function init(options) {
 
 	// init api
 	var api = new FancyAPI(
-		'http://local.fancysupport.com:4000/client',
-		'4nBDCN8yMwP5TkLPOKrdC50mBiEIVbKz',
-		'90871c583fd68c318fcad7df0319ab53656eb42c',
-		'545871964c129f718d000002'
+		options.api_url || 'https://api.fancysupport.com/client',
+		options.app_key,
+		options.signature,
+		options.customer_id
 	);
 
 	// init render engine, remove if we have one already
@@ -84,6 +97,10 @@ FancySupport.init = function init(options) {
 		store.log_errors = true;
 		window.addEventListener('error', catch_error);
 	}
+
+	// detect tab focus
+	document.removeEventListener('visibilitychange', has_focus);
+	document.addEventListener('visibilitychange', has_focus);
 
 	// make these available to the client
 	FancySupport.impression = function impression() {
