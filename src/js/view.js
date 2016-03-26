@@ -145,9 +145,9 @@ function View(store, api) {
 		var data = {
 			messages: this.store.messages_formatted(),
 			customer_avatar: this.store.customer_avatar(),
-			fancy_avatar: this.store.fancy_avatar()
+			fancy_avatar: this.store.fancy_avatar(),
+			introduction: this.store.introduction
 		};
-		console.log(data);
 
 		var messages = dom_elem('div');
 		messages.innerHTML = ViewTemplates.messages(data);
@@ -293,5 +293,18 @@ function View(store, api) {
 		}
 
 		return false;
+	};
+
+	// called from a poll or show
+	this.fetch_messages = function() {
+		var that = this;
+		this.api.get_messages(function(res, err) {
+			if (!err && Array.isArray(res.data)) {
+				for (var x = 0; x < res.data.length; x++) {
+					that.store.messages_add(res.data[x]);
+				}
+				that.messages_changed();
+			}
+		});
 	};
 }

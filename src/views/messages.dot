@@ -16,4 +16,8 @@
 			{{?}}
 		</div>
 	{{~}}
+	
+	{{? it.messages.length === 0}}
+		<div class="introduction">{{=it.introduction}}</div>
+	{{?}}
 </div>

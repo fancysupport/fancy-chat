@@ -1,5 +1,7 @@
 var view;
 var last_impression = Date.now();
+var last_poll = Date.now();
+var poll_ref;
 
 // catching global errors
 var catch_error = function(e) {
@@ -26,6 +28,13 @@ var has_focus = function(e) {
 			last_impression = Date.now();
 		}
 	} catch(ex) {}
+};
+
+var start_polling = function() {
+	clearInterval(poll_ref);
+	setInterval(function() {
+		view.fetch_messages();
+	}, 5*60*1000);
 };
 
 // make available to client
@@ -60,12 +69,13 @@ FancySupport.init = function init(options) {
 		console.error('FancySupport: custom_data needs to be an object.');
 		return;
 	}
-	
+
 	// init the store
 	var store = new Store();
 	store.default_activator = !options.hide_default_activator;
 	store.activator_selector = options.activator || null;
 	store.counter_selector = options.counter || null;
+	store.introduction = options.introduction;
 
 	// set customer details
 	store.customer = {
@@ -101,6 +111,9 @@ FancySupport.init = function init(options) {
 	// detect tab focus
 	document.removeEventListener('visibilitychange', has_focus);
 	document.addEventListener('visibilitychange', has_focus);
+
+	// start message polling
+	start_polling();
 
 	// make these available to the client
 	FancySupport.impression = function impression() {

@@ -10,6 +10,7 @@ function Store() {
 	this.chat_open = false;
 	this.inited = false;
 	this.log_errors = false;
+	this.introduction = null;
 
 	this.settings = {
 		app_name: '',
@@ -45,14 +46,12 @@ function Store() {
 	};
 
 	this.messages_remove = function(id) {
-		console.log('removing message', id);
 		for (var x = 0; x < this.messages.length; x++) {
 			if (this.messages[x].id === id) this.messages.splice(x, 1);
 		}
 	};
 
 	this.messages_add = function(msg) {
-		console.log('adding message', msg);
 		if (typeof msg !== 'object') return;
 
 		// replace if it exists
