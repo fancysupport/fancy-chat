@@ -58,6 +58,9 @@ box-sizing()
 			font-weight bold
 			border-radius 12px
 
+			&:empty
+				display none
+
 	.chat
 		border 0
 		border-left 1px solid #dadada
@@ -155,6 +158,7 @@ box-sizing()
 
 			.input-container
 				position relative
+				padding 0 10px
 
 				textarea
 				.textcopy
@@ -166,7 +170,6 @@ box-sizing()
 					padding 5px
 					overflow-y auto
 					font-family 'Helvetica Neue', Helvetica, Arial, sans-serif
-					margin 0 10px
 
 				textarea
 					resize none
