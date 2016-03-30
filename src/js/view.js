@@ -25,7 +25,7 @@ function View(store, api) {
 			that.rerender();
 		});
 
-		this.show();
+		//this.show();
 	};
 
 	// optionally pass a selector in so users can attach to dom elements
@@ -135,8 +135,7 @@ function View(store, api) {
 		chat.appendChild(header.firstChild);
 	};
 
-	var render_messages = function() {
-		// update counts
+	var render_counts = function() {
 		var count = this.store.unread_count();
 		if (this.store.counter_selector) {
 			dom_select(this.store.counter_selector).textContent = count || '';
@@ -144,6 +143,11 @@ function View(store, api) {
 			else remove_class(dom_select(this.store.counter_selector), 'unread');
 		}
 		if (this.store.default_activator) this.select('.activator .counter').textContent = count || '';
+	};
+
+	var render_messages = function() {
+		// update counts
+		render_counts.call(this);
 
 		// nothing else to do if not showing
 		var chat = this.select('.chat');
@@ -243,6 +247,8 @@ function View(store, api) {
 		if (this.store.chat_open) {
 			remove_chat.call(this);
 			render_chat.call(this);
+		} else {
+			render_counts.call(this);
 		}
 	};
 
