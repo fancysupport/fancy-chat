@@ -11,6 +11,7 @@ function Store() {
 	this.inited = false;
 	this.log_errors = false;
 	this.introduction = null;
+	this.fetched_all = false;
 
 	this.settings = {
 		app_name: '',

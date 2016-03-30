@@ -169,7 +169,8 @@ function View(store, api) {
 			messages: this.store.messages_formatted(),
 			customer_avatar: this.store.customer_avatar(),
 			fancy_avatar: this.store.fancy_avatar(),
-			introduction: this.store.introduction
+			introduction: this.store.introduction,
+			fetch_more: (!this.store.fetched_all && this.store.messages.length >= 18)
 		};
 
 		var messages = dom_elem('div');
@@ -184,6 +185,12 @@ function View(store, api) {
 		else {
 			chat.appendChild(messages.firstChild);
 		}
+
+		// add the handler to it
+		var that = this;
+		if (data.fetch_more) add_event('click', this.select('.chat .messages .fetch_more'), function() {
+			that.fetch_messages(true);
+		});
 	};
 
 	var render_input = function() {
@@ -327,13 +334,14 @@ function View(store, api) {
 	// called from a poll or show
 	this.fetch_messages = function(all) {
 		var that = this;
-		var since = false;
+		var since = 0;
 		if (!all) since = this.store.last_msg_time();
 		this.api.get_messages({since: since}, function(res, err) {
 			if (!err && Array.isArray(res.data) && res.data.length) {
 				for (var x = 0; x < res.data.length; x++) {
 					that.store.messages_add(res.data[x]);
 				}
+				if (all) that.store.fetched_all = true;
 				that.messages_changed();
 			}
 		});

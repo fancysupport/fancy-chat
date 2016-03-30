@@ -1,4 +1,7 @@
 <div class="messages">
+	{{?it.fetch_more}}
+		<div class="fetch_more">fetch more messages</div>
+	{{?}}
 	{{~it.messages :msg}}
 		<div class="message">
 			{{? msg.incoming}}
