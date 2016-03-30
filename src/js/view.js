@@ -48,6 +48,17 @@ function View(store, api) {
 
 		// hide the default activator
 		if (this.store.default_activator) add_class(this.select('.activator'), 'hide');
+
+		// check if msgs need to be marked as read
+		var that = this;
+		if (this.store.unread_count()) {
+			this.api.read_messages(function(res, err) {
+				if (!err) {
+					that.store.settings.last_read = Math.floor(Date.now()/1000);
+					render_counts.call(that);
+				}
+			});
+		}
 	};
 
 	// hide the chat interface
@@ -232,6 +243,10 @@ function View(store, api) {
 			input.querySelector('.textcopy').innerHTML = content;
 			// need to make sure the size of messages list stays true
 			this.set_chat_size();
+
+			// if we have content change the powered by message
+			if (content.length) this.select('.powered-by-fancy').innerHTML = 'shift-enter for new line, enter to send';
+
 		};
 		add_event('change', input.firstChild, copy.bind(this, input.firstChild));
 		add_event('keyup', input.firstChild, copy.bind(this, input.firstChild));

@@ -14,14 +14,12 @@ function Store() {
 
 	this.settings = {
 		app_name: '',
-		app_icon: ''
+		app_icon: '',
+		last_read: '0'
 	};
 
 	this.customer = {};
 	this.messages = [];
-
-	// keeping track of the user input as they type for re-renders
-	this.user_input = '';
 
 	this.impression_data = function() {
 		var d = {
