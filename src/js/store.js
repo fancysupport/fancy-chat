@@ -98,5 +98,13 @@ function Store() {
 		return count;
 	};
 
+	this.last_msg_time = function() {
+		var last = 0;
+		for (var x = 0; x < this.messages.length; x++) {
+			if (this.messages[x].created > last) last = this.messages[x].created;
+		}
+		return last;
+	};
+
 }
 

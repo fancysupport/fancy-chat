@@ -7,7 +7,12 @@ function FancyAPI(url, key, sig, customer_id) {
 	// general http fn
 	this.request = function(opts, cb) {
 		var r = new XMLHttpRequest();
-		r.open(opts.method, this.url+opts.path, true);
+		var url = this.url+opts.path;
+		if (opts.qs) {
+			url += '?' + make_query_string(opts.qs);
+		}
+
+		r.open(opts.method, url, true);
 
 		if (opts.json) {
 			r.setRequestHeader('Content-type', 'application/json');
@@ -57,9 +62,10 @@ function FancyAPI(url, key, sig, customer_id) {
 	};
 
 	// get messages 
-	this.get_messages = function(cb) {
+	this.get_messages = function(qs, cb) {
 		this.request({
 			method: 'GET',
+			qs: qs,
 			path: '/messages'
 		}, cb);
 	};

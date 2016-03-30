@@ -304,10 +304,12 @@ function View(store, api) {
 	};
 
 	// called from a poll or show
-	this.fetch_messages = function() {
+	this.fetch_messages = function(all) {
 		var that = this;
-		this.api.get_messages(function(res, err) {
-			if (!err && Array.isArray(res.data)) {
+		var since = false;
+		if (!all) since = this.store.last_msg_time();
+		this.api.get_messages({since: since}, function(res, err) {
+			if (!err && Array.isArray(res.data) && res.data.length) {
 				for (var x = 0; x < res.data.length; x++) {
 					that.store.messages_add(res.data[x]);
 				}

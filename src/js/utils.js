@@ -69,3 +69,11 @@ function random_id(len) {
 	return id;
 }
 
+function make_query_string(obj) {
+	var str = [];
+	for(var p in obj)
+		if (obj.hasOwnProperty(p)) {
+			str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+	}
+	return str.join("&");
+}
