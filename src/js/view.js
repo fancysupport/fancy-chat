@@ -148,7 +148,7 @@ function View(store, api) {
 
 	var render_counts = function() {
 		var count = this.store.unread_count();
-		if (this.store.counter_selector) {
+		if (dom_select(this.store.counter_selector)) {
 			dom_select(this.store.counter_selector).textContent = count || '';
 			if (count) add_class(dom_select(this.store.counter_selector), 'unread');
 			else remove_class(dom_select(this.store.counter_selector), 'unread');
